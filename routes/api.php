@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,3 +27,9 @@ route::middleware('auth:sanctum')->controller(AuthController::class)->group(func
     route::post('logout','logout');
     route::post('employee-signup','employeecreate');
 });
+Route::controller(PasswordController::class)->group(function(){
+        route::post('forget-password','forgot');
+        route::post('reset-password','reset')->name('password.reset');
+});
+
+
