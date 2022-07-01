@@ -23,5 +23,6 @@ Route::controller(AuthController::class)->group(function()
 
 route::middleware('auth:sanctum')->controller(AuthController::class)->group(function()
 {
+    route::post('logout','logout');
     route::post('employee-signup','employeecreate');
 });

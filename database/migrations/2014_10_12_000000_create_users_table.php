@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('department')->nullable();
             $table->string('designation')->nullable();
             $table->string('company_img')->nullable();
+            $table->string('image')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
