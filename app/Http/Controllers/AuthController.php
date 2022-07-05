@@ -120,28 +120,16 @@ class AuthController extends Controller
                 'message' => 'The provided credentials are incorrect.'
             ], 401);
         }
-        if ($user->role == 0) {
-            $token = $user->createToken('mytoken')->plainTextToken;
 
-            $response = [
-                'user' => $user,
-                'token' => $token
-            ];
+        $token = $user->createToken('mytoken')->plainTextToken;
 
-            $message = 'Successfully logged in as admin';
-            return response()->json([$response, $message]);
-        }
-        if ($user->role == 1) {
-            $token = $user->createToken('mytoken')->plainTextToken;
+        $response = [
+            'user' => $user,
+            'token' => $token
+        ];
 
-            $response = [
-                'user' => $user,
-                'token' => $token
-            ];
-
-            $message = 'Successfully logged in as employee';
-            return response()->json([$response, $message]);
-        }
+        $message = 'Successfully logged in ';
+        return response()->json([$response, $message]);
     }
 
     public function logout(request $request)
@@ -151,9 +139,6 @@ class AuthController extends Controller
         return response([
             'message' => 'Succefully Logged Out !!'
 
-        ],200);
-
-
-
+        ], 200);
     }
 }
