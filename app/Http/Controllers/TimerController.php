@@ -39,11 +39,9 @@ class TimerController extends Controller
 
     public function show($id)
     {
-
         $data = Timer::where('user_id', $id)
             ->whereDate('started_at', Carbon::today()->toDateString())
             ->select('id', 'image', 'started_at', 'stopped_at', 'created_at', 'updated_at')->get();
-
         return response()->json($data);
     }
 }

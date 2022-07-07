@@ -18,23 +18,23 @@ use App\Http\Controllers\TimerController;
 */
 
 Route::controller(AuthController::class)->group(function () {
-    route::post('signup', 'admincreate');
-    route::post('login', 'login');
+    Route::post('signup', 'admincreate');
+    Route::post('login', 'login');
 });
 
-route::middleware('auth:sanctum')->group(function () {
-    route::controller(AuthController::class)->group(function () {
-        route::post('logout', 'logout');
-        route::post('employee-signup', 'employeecreate');
+Route::middleware('auth:sanctum')->group(function () {
+    Route::controller(AuthController::class)->group(function () {
+        Route::post('logout', 'logout');
+        Route::post('employee-signup', 'employeecreate');
     });
-    route::controller(TimerController::class)->group(function () {
-        route::post('timer/{id}', 'store');
-        route::get('data/{id}', 'show');
+    Route::controller(TimerController::class)->group(function () {
+        Route::post('timer/{id}', 'store');
+        Route::get('data/{id}', 'show');
     });
 });
 
 
 Route::controller(PasswordController::class)->group(function () {
-    route::post('forget-password', 'forgot');
-    route::post('reset-password', 'reset')->name('password.reset');
+    Route::post('forget-password', 'forgot');
+    Route::post('reset-password', 'reset')->name('password.reset');
 });
