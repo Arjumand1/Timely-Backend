@@ -6,6 +6,7 @@ use App\Models\Timer;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Repos\ImageRepository;
+use Carbon\Carbon;
 
 class TimerController extends Controller
 {
@@ -16,8 +17,7 @@ class TimerController extends Controller
 
             'image' => 'required',
 
-            'started_at' => 'required',
-            'stopped_at' => 'required'
+            'started_at' => 'required'
 
         ]);
 
@@ -39,9 +39,11 @@ class TimerController extends Controller
 
     public function show($id)
     {
-        $data = Timer::where('user_id', $id)->pluck('image')->all();
 
+        $data = Timer::where('user_id', $id)
+            ->whereDate('started_at', Carbon::today()->toDateString())
+            ->select('id', 'image', 'started_at', 'stopped_at', 'created_at', 'updated_at')->get();
 
-        return response($data);
+        return response()->json($data);
     }
 }

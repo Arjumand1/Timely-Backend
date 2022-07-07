@@ -19,13 +19,25 @@ class Timer extends Model
 
     protected $casts = [
 
-        'started_at'=>'datetime',
-        'stopped_at'=>'datetime',
+        'started_at' => 'datetime',
+        'stopped_at' => 'datetime',
 
     ];
 
-     public function users()
-     {
+    public function users()
+    {
         $this->belongsTo(User::class);
-     }
+    }
+    protected $dates = [
+        'started_at',
+        'stopped_at'
+    ];
+    protected $appends = ['today_time'];
+
+    public function getTodayTimeAttribute()
+    {
+        $data = $this->started_at->diffInSeconds($this->stopped_at);
+        $data = gmdate('H:i:s', $data);
+        return $data;
+    }
 }
