@@ -27,7 +27,7 @@ class ImageRepository
         $image = str_replace(' ', '+', $image);
         // set the image name using the time and a random string plus
         // an extension
-        $imageName = time().'_'.Str::random(20).'.'.$extension;
+        $imageName = time().'_'.Str::random(20).$extension;
         // save the image in the image path we passed from the
         // function parameter.
         Storage::disk('public')->put($image_path .$imageName, base64_decode($image));
