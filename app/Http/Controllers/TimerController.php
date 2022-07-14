@@ -7,7 +7,6 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Repos\ImageRepository;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class TimerController extends Controller
 {
@@ -34,8 +33,9 @@ class TimerController extends Controller
         $data->started_at = $request['started_at'];
         $data->stopped_at = $request['stopped_at'];
 
-        $data->total_time=$data->started_at->diffInSeconds($data->stopped_at);
+        $time = $data->started_at->diffInSeconds($data->stopped_at);
 
+        $data->total_time = $time;
         $data->save();
 
         return response()->json([$data]);
@@ -45,11 +45,7 @@ class TimerController extends Controller
     {
         $data = Timer::where('user_id', $id)
             ->whereDate('started_at', Carbon::now()->toDateString())
-
-            ->select('id', 'image', 'started_at', 'stopped_at')->get();
-
+            ->select('id', 'image', 'started_at', 'stopped_at', 'total_time')->get();
         return response()->json([$data]);
-
-
     }
 }

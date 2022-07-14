@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->string('started_at')->nullable();
             $table->string('stopped_at')->nullable();
-            $table->string('total_time')->nullable();
+            $table->bigInteger('total_time')->nullable();
             $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();
         });
