@@ -8,9 +8,10 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Auth\Events\PasswordReset;
 
-
+//controller for froget password and password reset
 class PasswordController extends Controller
 {
+    //this method would send an email for resetting password
     public function forgot(request $request)
     {
         $request->validate(['email' => 'required|email']);
@@ -27,6 +28,8 @@ class PasswordController extends Controller
         $message = 'operation failed...';
         return response()->json([$message]);
     }
+
+    //this method will allow you to create new password
     public function reset(request $request)
     {
         $request->validate([

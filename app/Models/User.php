@@ -54,6 +54,7 @@ class User extends Authenticatable
 
     ];
 
+    //one-to-one relationship with timers model
     public function timers()
     {
         $this->hasMany(Timer::class);

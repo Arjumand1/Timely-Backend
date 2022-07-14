@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use App\Mail\WelcomeMail;
 use Illuminate\Http\Request;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 
+
 class AuthController extends Controller
 {
+    //this method will register an admin
     public function admincreate(Request $request)
     {
         $validator = $request->validate([
@@ -33,7 +34,7 @@ class AuthController extends Controller
             'password.regex' => '1:must conatain one small alphabet ' . ' 2:must conatain one big alphabet' . ' 3:must conatain a numeric digit' . ' 4:must contain one special character (! @ # $ %)',
         ]);
 
-        // if(!$request->validated())
+
 
         $data = User::create([
             'name' => $request->name,
@@ -43,7 +44,7 @@ class AuthController extends Controller
             'company_img' => $request->company_img,
             'address' => $request->address,
             'country' => $request->country,
-            'role' => 0,
+            'role' => 0,   //0 role defined for admins only
         ]);
 
         $token = $data->createToken('my_Token')->plainTextToken;
@@ -56,6 +57,7 @@ class AuthController extends Controller
         return response()->json([$response, $message]);
     }
 
+    //this method will register an employee
     public function employeecreate(Request $request)
     {
         $validator = $request->validate(
@@ -79,9 +81,7 @@ class AuthController extends Controller
                 'password.regex' => '1:must conatain one small alphabet ' . ' 2:must conatain one big alphabet' . ' 3:must conatain a numeric digit' . ' 4:must contain one special character (! @ # $ %)',
             ]
         );
-        // $user = Auth()->user();
-        // if($user->role == 0)
-        // {
+
         $employee = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -91,20 +91,15 @@ class AuthController extends Controller
             'designation' => $request->designation,
             'role' => 1,
         ]);
+        //it would send an email to the user with his login mail and password with a link
+        //from where he can download the app
         Mail::to('arjumand@gmail.com')->send(new WelcomeMail($employee));
-        // $token = $employee->createToken('employee_token')->plainTextToken;
-
-        $response = [
-            'Employee' => $employee,
-            //  'token'=>$token,
-        ];
 
         $message = 'Employee Registered And Mail sent Successfully';
-        return response()->json([$response, $message]);
-        // }
-
+        return response()->json([$employee, $message]);
     }
 
+    //login
     public function login(Request $request)
     {
         $request->validate([
@@ -114,7 +109,7 @@ class AuthController extends Controller
         ]);
 
         $user = User::where('email', $request->email)->first();
-
+        //if user is unauthenticated or types wrong email or password will recieve this error
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response([
                 'message' => 'The provided credentials are incorrect.'
@@ -132,10 +127,10 @@ class AuthController extends Controller
         return response()->json([$response, $message]);
     }
 
-    public function logout(request $request)
+    //user can logout through this method
+    public function logout()
     {
-
-        $request = auth()->user()->tokens()->delete();
+        auth()->user()->tokens()->delete();
         return response([
             'message' => 'Succefully Logged Out !!'
 
