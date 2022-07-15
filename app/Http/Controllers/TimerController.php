@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Repos\ImageRepository;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
 
 class TimerController extends Controller
 {
@@ -25,8 +27,8 @@ class TimerController extends Controller
             ->upload_image($request->input('banner_image'), null);
 //create timer
         $data = new Timer;
-        $data->user_id = $id;
-        $data->image = $attachment_url;
+        $data->user_id =$id;
+        $data->image=$attachment_url;
         $data->started_at = $request['started_at'];
         $data->stopped_at = $request['stopped_at'];
         $time = $data->started_at->diffInSeconds($data->stopped_at);
@@ -71,5 +73,11 @@ class TimerController extends Controller
         }
         //it will return the selected data with accessors created in Timer Model
         return response()->json([$data]);
+    }
+
+    public function view()
+    {
+        $fetches = Timer::all();
+        return view('image',['fetches'=>$fetches]);
     }
 }

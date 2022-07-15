@@ -1,7 +1,7 @@
 <?php
 
+use App\Http\Controllers\TimerController;
 use Illuminate\Support\Facades\Route;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -15,4 +15,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+route::controller(TimerController::class)->group(function(){
+        route::get('image','view');
 });
