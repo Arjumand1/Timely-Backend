@@ -39,6 +39,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('timer/{id}', 'store');
         //get data
         Route::get('data/{id}', 'show');
+
     });
 });
 
@@ -49,3 +50,5 @@ Route::controller(PasswordController::class)->group(function () {
     //reset password
     Route::post('reset-password', 'reset')->name('password.reset');
 });
+
+

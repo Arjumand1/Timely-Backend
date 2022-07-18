@@ -43,9 +43,9 @@ class Timer extends Model
     {
         $timer = Timer::whereDate('started_at', Carbon::now()->toDateString())
             ->sum('total_time');
-        $data = gmdate("H:i:s", $timer);
+        // $data = gmdate("H:i:s", $timer);
         //expected response
-        return $data;
+        return $timer;
     }
 
     //it would give weekly time
@@ -53,9 +53,9 @@ class Timer extends Model
     {
         $timer = Timer::whereBetween('started_at', [Carbon::now()->startOfWeek()->toDateString(), Carbon::today()->addDay()])
             ->sum('total_time');
-        $data = gmdate("H:i:s", $timer);
+        // $data = gmdate("H:i:s", $timer);
         //expected response
-        return $data;
+        return $timer;
     }
 
     //it would give monthly time
@@ -63,8 +63,8 @@ class Timer extends Model
     {
         $timer = Timer::whereBetween('started_at', [Carbon::now()->startOfMonth()->toDateString(), Carbon::today()->addDay()])
             ->sum('total_time');
-        $data = gmdate("H:i:s", $timer);
+        // $data = gmdate("H:i:s", $timer);
         //expected response
-        return $data;
+        return $timer;
     }
 }

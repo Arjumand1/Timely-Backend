@@ -3,63 +3,70 @@
 namespace App\Http\Controllers;
 
 use App\Models\Timer;
-use App\Models\User;
 use Illuminate\Http\Request;
-use App\Repos\ImageRepository;
 use Carbon\Carbon;
-use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
+use Exception;
 
 class TimerController extends Controller
 {
     //this method will store timer data with screenshot
     public function store(Request $request, $id)
     {
-      try{
-        //validate the request
-        $this->validate($request, [
-            'image' => 'required',
-            'started_at' => 'required'
-        ]);
+        try {
+            //validate the request
+            $this->validate($request, [
+                'image' => 'required',
+                'started_at' => 'required'
+            ]);
 
-        $attachment_url = (new ImageRepository)
-            ->upload_image($request->input('banner_image'), null);
-//create timer
-        $data = new Timer;
-        $data->user_id =$id;
-        $data->image=$attachment_url;
-        $data->started_at = $request['started_at'];
-        $data->stopped_at = $request['stopped_at'];
-        $time = $data->started_at->diffInSeconds($data->stopped_at);
-        $data->total_time = $time;
-        $data->save();
-    } catch (Exception $e) {
-//throw execption
-        $message = $e->getMessage();
-        var_dump('Exception Message: ' . $message);
+            //create timer
+            $data = new Timer;
+            $data->user_id = $id;
+           //base64 string to image conversion
+            preg_match("/data:image\/(.*?);/", $request->image, $image_extension); // extract the image extension
+            $image = preg_replace('/data:image\/(.*?);base64,/', '', $request->image); // remove the type part
+            $image = str_replace(' ', '+', $image);
+            $imageName = 'image_' . Str::random(20) . '.' . $image_extension[1]; //generating unique file name;
+            Storage::disk('public')->put($imageName, base64_decode($image)); // image base64 encoded
+            $data->image = $imageName;
 
-        $code = $e->getCode();
-        var_dump('Exception Code: ' . $code);
+            $data->started_at = $request['started_at'];
+            $data->stopped_at = $request['stopped_at'];
+            $time = $data->started_at->diffInSeconds($data->stopped_at);
+            $data->total_time = $time;
 
-        $string = $e->__toString();
-        var_dump('Exception String: ' . $string);
+            $data->save();
+        } catch (Exception $e) {
+            //throw execption
+            $message = $e->getMessage();
+            var_dump('Exception Message: ' . $message);
 
-        exit;
-    }
-    //expected response
+            $code = $e->getCode();
+            var_dump('Exception Code: ' . $code);
+
+            $string = $e->__toString();
+            var_dump('Exception String: ' . $string);
+
+            exit;
+        }
+        //expected response
         return response()->json([$data]);
     }
 
     //this method will get timer info e.g daily time,weekly time, monthly time,screenshot image
     public function show($id)
     {
-        try{
-        $data = Timer::where('user_id', $id)
-            ->whereDate('started_at', Carbon::now()->toDateString())
-            ->select('id', 'image', 'started_at', 'stopped_at', 'total_time')->get();
+        try {
+            $data = Timer::where('user_id', $id)
+                ->whereDate('started_at', Carbon::now()->toDateString())
+                ->select('id','image','started_at', 'stopped_at', 'total_time')->get();
+
+
         } catch (Exception $e) {
-//throw exeption
+            //throw exeption
             $message = $e->getMessage();
             var_dump('Exception Message: ' . $message);
 
@@ -73,11 +80,5 @@ class TimerController extends Controller
         }
         //it will return the selected data with accessors created in Timer Model
         return response()->json([$data]);
-    }
-
-    public function view()
-    {
-        $fetches = Timer::all();
-        return view('image',['fetches'=>$fetches]);
     }
 }

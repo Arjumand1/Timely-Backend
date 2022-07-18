@@ -17,6 +17,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-route::controller(TimerController::class)->group(function(){
-        route::get('image','view');
-});
+// route::controller(TimerController::class)->group(function(){
+//         route::get('image','view');
+// });
