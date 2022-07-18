@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Timer;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Exception;
@@ -29,12 +28,12 @@ class TimerController extends Controller
             preg_match("/data:image\/(.*?);/", $request->image, $image_extension); // extract the image extension
             $image = preg_replace('/data:image\/(.*?);base64,/', '', $request->image); // remove the type part
             $image = str_replace(' ', '+', $image);
-            $imageName = 'image_' . Str::random(20) . '.' . $image_extension[1]; //generating unique file name;
-            Storage::disk('public')->put($imageName, base64_decode($image)); // image base64 encoded
+            $imageName = 'image_' . Str::random(20) . '.' . @$image_extension[1]; //generating unique file name;
             $data->image = $imageName;
+            Storage::disk('public')->put($imageName, base64_decode($image)); // image base64 encoded
 
             $data->started_at = $request['started_at'];
-            $data->stopped_at = $request['stopped_at'];
+            $data->stopped_at = '00:00:00';
             $time = $data->started_at->diffInSeconds($data->stopped_at);
             $data->total_time = $time;
 
