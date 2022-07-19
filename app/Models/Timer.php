@@ -28,7 +28,7 @@ class Timer extends Model
     //one-to-one relation with User model
     public function users()
     {
-        $this->belongsTo(User::class);
+      return  $this->belongsTo(User::class);
     }
 
     protected $dates = [

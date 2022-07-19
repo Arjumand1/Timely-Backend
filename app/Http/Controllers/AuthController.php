@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Exception;
+use Illuminate\Support\Str;
 
 
 class AuthController extends Controller
@@ -17,7 +18,7 @@ class AuthController extends Controller
     {
         try {
             //validate the request
-            $validator = $request->validate([
+            $request->validate([
                 'name' => 'required',
                 'email' => 'required',
                 'password' => [
@@ -33,7 +34,7 @@ class AuthController extends Controller
                 'address' => 'required',
                 'country' => 'required'
             ], [
-                'password.min' => 'password must be greater than eight characters',
+                'password.min' => 'password must not be greater than eight characters',
                 'password.regex' => '1:must conatain one small alphabet ' . ' 2:must conatain one big alphabet' . ' 3:must conatain a numeric digit' . ' 4:must contain one special character (! @ # $ %)',
             ]);
 
@@ -80,7 +81,7 @@ class AuthController extends Controller
     {
         try {
             //validate the request
-            $validator = $request->validate(
+            $request->validate(
                 [
                     'name' => 'required',
                     'department' => 'required',
@@ -97,22 +98,24 @@ class AuthController extends Controller
                     'designation' => 'required'
                 ],
                 [
-                    'password.min' => 'password must be greater than eight characters',
+                    'password.min' => 'password must not be greater than eight characters',
                     'password.regex' => '1:must conatain one small alphabet ' . ' 2:must conatain one big alphabet' . ' 3:must conatain a numeric digit' . ' 4:must contain one special character (! @ # $ %)',
                 ]
             );
             //create employee
+            $random_password = Str::random(6) . time();
+            $user = $random_password;
             $employee = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
-                'password' => Hash::make($request->password),
+                'password' => md5($random_password),
                 'department' => $request->department,
                 'image' => $request->image,
                 'designation' => $request->designation,
                 'role' => 1,
             ]);
             //send mail with credentials
-            Mail::to('arjumand@gmail.com')->send(new WelcomeMail($employee));
+            Mail::to($employee)->send(new WelcomeMail($employee, $random_password));
 
             $message = 'Employee Registered And Mail sent Successfully';
         } catch (Exception $e) {

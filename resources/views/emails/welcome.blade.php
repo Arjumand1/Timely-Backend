@@ -4,6 +4,11 @@
 You can login into our app by using following credentials
 
 <b>Email:</b>{{$name->email}} <br>
+<br>
+<b>Password:{{$name->password}}</b>
+
+<b>Note:</b>
+<p style="color: rgb(255, 0, 0)">please change your password before login</p>
 
 You can download our application from here
 

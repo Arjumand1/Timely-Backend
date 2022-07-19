@@ -39,6 +39,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('timer/{id}', 'store');
         //get data
         Route::get('data/{id}', 'show');
+        //screenshots record
+        route::get('image/{date}','view');
+        //alldata
+        route::get('details','alldata');
 
     });
 });

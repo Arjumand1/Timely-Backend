@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Timer;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
@@ -24,7 +25,7 @@ class TimerController extends Controller
             //create timer
             $data = new Timer;
             $data->user_id = $id;
-           //base64 string to image conversion
+            //base64 string to image conversion
             preg_match("/data:image\/(.*?);/", $request->image, $image_extension); // extract the image extension
             $image = preg_replace('/data:image\/(.*?);base64,/', '', $request->image); // remove the type part
             $image = str_replace(' ', '+', $image);
@@ -61,9 +62,7 @@ class TimerController extends Controller
         try {
             $data = Timer::where('user_id', $id)
                 ->whereDate('started_at', Carbon::now()->toDateString())
-                ->select('id','image','started_at', 'stopped_at', 'total_time')->get();
-
-
+                ->select('id', 'image', 'started_at', 'stopped_at', 'total_time')->get();
         } catch (Exception $e) {
             //throw exeption
             $message = $e->getMessage();
@@ -78,6 +77,47 @@ class TimerController extends Controller
             exit;
         }
         //it will return the selected data with accessors created in Timer Model
+        return response()->json([$data]);
+    }
+
+    public function view($date)
+    {
+        try {
+            $data = Timer::whereDate('created_at', $date)->select('image', 'created_at')->get();
+        } catch (Exception $e) {
+            //throw exeption
+            $message = $e->getMessage();
+            var_dump('Exception Message: ' . $message);
+
+            $code = $e->getCode();
+            var_dump('Exception Code: ' . $code);
+
+            $string = $e->__toString();
+            var_dump('Exception String: ' . $string);
+
+            exit;
+        }
+        //get screenshots with specific date
+        return response()->json([$data]);
+    }
+    public function alldata()
+    {
+        try {
+            $data = User::select('id', 'name', 'email')->with('last_timer')->get();
+        } catch (Exception $e) {
+            //throw exeption
+            $message = $e->getMessage();
+            var_dump('Exception Message: ' . $message);
+
+            $code = $e->getCode();
+            var_dump('Exception Code: ' . $code);
+
+            $string = $e->__toString();
+            var_dump('Exception String: ' . $string);
+
+            exit;
+        }
+        //get all users
         return response()->json([$data]);
     }
 }
