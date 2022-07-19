@@ -10,6 +10,9 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Exception;
 
+use function PHPUnit\Framework\isEmpty;
+use function PHPUnit\Framework\isNull;
+
 class TimerController extends Controller
 {
     //this method will store timer data with screenshot
@@ -60,6 +63,7 @@ class TimerController extends Controller
     public function show($id)
     {
         try {
+
             $data = Timer::where('user_id', $id)
                 ->whereDate('started_at', Carbon::now()->toDateString())
                 ->select('id', 'image', 'started_at', 'stopped_at', 'total_time')->get();
@@ -76,8 +80,13 @@ class TimerController extends Controller
 
             exit;
         }
+        if ($data->isEmpty()) {
+            $time = Timer::where('user_id', $id)->select('total_time')->orderby('id', 'desc')->first();
+            return response()->json($time);
+        }
+
         //it will return the selected data with accessors created in Timer Model
-        return response()->json([$data]);
+        return response()->json($data);
     }
 
     public function view($date)
