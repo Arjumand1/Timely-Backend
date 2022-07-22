@@ -9,10 +9,6 @@ use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Exception;
-
-use function PHPUnit\Framework\isEmpty;
-use function PHPUnit\Framework\isNull;
-
 class TimerController extends Controller
 {
     //this method will store timer data with screenshot
@@ -80,6 +76,7 @@ class TimerController extends Controller
 
             exit;
         }
+        //if there is no data for today(present day) return previous time
         if ($data->isEmpty()) {
             $time = Timer::where('user_id', $id)->select('total_time')->orderby('id', 'desc')->first();
             return response()->json($time);

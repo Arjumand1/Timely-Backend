@@ -24,7 +24,7 @@ class AuthController extends Controller
                 'password' => [
                     'required',
                     'string',
-                    'min:08',             // must be at least 10 characters in length
+                    'min:08',             // must be at least 08 characters in length
                     'regex:/[a-z]/',      // must contain at least one lowercase letter
                     'regex:/[A-Z]/',      // must contain at least one uppercase letter
                     'regex:/[0-9]/',      // must contain at least one digit
@@ -89,7 +89,7 @@ class AuthController extends Controller
                     'password' => [
                         'required',
                         'string',
-                        'min:08',             // must be at least 10 characters in length
+                        'min:08',             // must be at least 08 characters in length
                         'regex:/[a-z]/',      // must contain at least one lowercase letter
                         'regex:/[A-Z]/',      // must contain at least one uppercase letter
                         'regex:/[0-9]/',      // must contain at least one digit
