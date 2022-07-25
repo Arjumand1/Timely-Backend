@@ -103,19 +103,18 @@ class AuthController extends Controller
                 ]
             );
             //create employee
-            $random_password = Str::random(6).time();
-            $employee = $random_password;
+
             $employee = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
-                'password' => Hash::make($random_password),
+                'password' => Hash::make($request->password),
                 'department' => $request->department,
                 'image' => $request->image,
                 'designation' => $request->designation,
                 'role' => 1,
             ]);
             //send mail with credentials
-            Mail::to($employee)->send(new WelcomeMail($employee,$random_password));
+            Mail::to($employee)->send(new WelcomeMail($employee));
 
             $message = 'Employee Registered And Mail sent Successfully';
         } catch (Exception $e) {
