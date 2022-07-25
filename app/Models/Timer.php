@@ -36,7 +36,7 @@ class Timer extends Model
         'stopped_at'
     ];
     //calling accessors for getting daily,weekly and monthly time
-    protected $appends = ['today_time', 'weekly_time', 'monthly_time'];
+    protected $appends = ['today_time', 'weekly_time', 'monthly_time','captured_date'];
 
     //this should get daily_time
     public function getTodayTimeAttribute()
@@ -67,4 +67,11 @@ class Timer extends Model
         //expected response
         return $timer;
     }
+
+    public function getCapturedDateAttribute()
+    {
+        return $this->created_at->shiftTimezone('GMT-5');
+    }
+
+
 }

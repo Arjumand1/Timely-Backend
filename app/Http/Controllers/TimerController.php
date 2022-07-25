@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Exception;
+
 class TimerController extends Controller
 {
     //this method will store timer data with screenshot
@@ -62,7 +63,7 @@ class TimerController extends Controller
 
             $data = Timer::where('user_id', $id)
                 ->whereDate('started_at', Carbon::now()->toDateString())
-                ->select('id', 'image', 'started_at', 'stopped_at', 'total_time')->get();
+                ->select('id', 'image', 'started_at', 'stopped_at', 'total_time','created_at')->get();
         } catch (Exception $e) {
             //throw exeption
             $message = $e->getMessage();
@@ -89,7 +90,7 @@ class TimerController extends Controller
     public function view($date)
     {
         try {
-            $data = Timer::whereDate('created_at', $date)->select('image', 'created_at')->get();
+            $data = Timer::whereDate('created_at', $date)->select('image','created_at')->get();
         } catch (Exception $e) {
             //throw exeption
             $message = $e->getMessage();
@@ -109,7 +110,9 @@ class TimerController extends Controller
     public function alldata()
     {
         try {
-            $data = User::select('id', 'name', 'email')->with('last_timer')->get();
+            $data = User::select('id', 'name', 'email')->with(['last_timer' => function($query) {
+                $query->select('user_id','created_at');
+            }])->get();
         } catch (Exception $e) {
             //throw exeption
             $message = $e->getMessage();
@@ -125,5 +128,7 @@ class TimerController extends Controller
         }
         //get all users
         return response()->json([$data]);
+    //    ->with('last_timer')
+
     }
 }
