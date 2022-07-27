@@ -36,7 +36,7 @@ Route::middleware('auth:sanctum')->group(function () {
     //timer controller
     Route::controller(TimerController::class)->group(function () {
         //store data
-        Route::post('timer/{id}', 'store')->middleware('throttle:1');
+        Route::post('timer/{id}', 'store')->middleware('throttle:15');
         //get data
         Route::get('data/{id}', 'show');
         //screenshots record
