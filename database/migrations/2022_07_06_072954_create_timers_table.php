@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('started_at')->nullable();
             $table->string('stopped_at')->nullable();
             $table->bigInteger('total_time')->nullable();
+            $table->string('captured_at')->nullable();
             $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();
         });

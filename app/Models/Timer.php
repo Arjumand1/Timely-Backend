@@ -14,6 +14,7 @@ class Timer extends Model
         'user_id',
         'started_at',
         'stopped_at',
+        'captured_at',
         'total_time',
         'image',
     ];
@@ -23,20 +24,23 @@ class Timer extends Model
         'started_at' => 'datetime',
         'stopped_at' => 'datetime',
 
+        // 'captured_at' => 'datetime'
+
     ];
 
     //one-to-one relation with User model
     public function users()
     {
-      return  $this->belongsTo(User::class);
+        return  $this->belongsTo(User::class);
     }
 
     protected $dates = [
         'started_at',
-        'stopped_at'
+        'stopped_at',
+        'captured_at'
     ];
     //calling accessors for getting daily,weekly and monthly time
-    protected $appends = ['today_time', 'weekly_time', 'monthly_time','captured_date'];
+    protected $appends = ['today_time', 'weekly_time', 'monthly_time'];
 
     //this should get daily_time
     public function getTodayTimeAttribute()
@@ -67,11 +71,4 @@ class Timer extends Model
         //expected response
         return $timer;
     }
-
-    public function getCapturedDateAttribute()
-    {
-        return $this->created_at->shiftTimezone('GMT-5');
-    }
-
-
 }

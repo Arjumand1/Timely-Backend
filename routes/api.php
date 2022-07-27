@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PasswordController;
@@ -36,7 +35,7 @@ Route::middleware('auth:sanctum')->group(function () {
     //timer controller
     Route::controller(TimerController::class)->group(function () {
         //store data
-        Route::post('timer/{id}', 'store');
+        Route::post('timer/{id}', 'store')->middleware('throttle:1');
         //get data
         Route::get('data/{id}', 'show');
         //screenshots record

@@ -6,6 +6,7 @@ use App\Models\Timer;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use DateTimeZone;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Exception;
@@ -15,11 +16,18 @@ class TimerController extends Controller
     //this method will store timer data with screenshot
     public function store(Request $request, $id)
     {
+        //  dd(
+        //     // $request['captured_at'],
+        //     // Str::substr($request['captured_at'], 0, 33),
+        // Carbon::parse(Str::substr($request['captured_at'], 0, 33))->setTimezone('GMT+5')
+
+        // );
         try {
             //validate the request
             $this->validate($request, [
                 'image' => 'required',
-                'started_at' => 'required'
+                'started_at' => 'required',
+                'captured_at' => 'required'
             ]);
 
             //create timer
@@ -37,6 +45,7 @@ class TimerController extends Controller
             $data->stopped_at = '00:00:00';
             $time = $data->started_at->diffInSeconds($data->stopped_at);
             $data->total_time = $time;
+            $data->captured_at = Carbon::parse(Str::substr($request['captured_at'], 0, 33));
 
             $data->save();
         } catch (Exception $e) {
@@ -53,7 +62,7 @@ class TimerController extends Controller
             exit;
         }
         //expected response
-        return response()->json([$data]);
+        return response()->json([$data], 200);
     }
 
     //this method will get timer info e.g daily time,weekly time, monthly time,screenshot image
@@ -63,7 +72,7 @@ class TimerController extends Controller
 
             $data = Timer::where('user_id', $id)
                 ->whereDate('started_at', Carbon::now()->toDateString())
-                ->select('id', 'image', 'started_at', 'stopped_at', 'total_time','created_at')->get();
+                ->select('id', 'started_at', 'stopped_at', 'total_time')->get();
         } catch (Exception $e) {
             //throw exeption
             $message = $e->getMessage();
@@ -84,13 +93,20 @@ class TimerController extends Controller
         }
 
         //it will return the selected data with accessors created in Timer Model
-        return response()->json($data);
+        return response()->json($data, 200);
     }
 
-    public function view($date)
+    public function view(Request $request, $date)
     {
         try {
-            $data = Timer::whereDate('created_at', $date)->select('image','created_at')->get();
+            $ip = $request->ip();
+            // $ip = "136.22.83.240"; //$_SERVER['REMOTE_ADDR'];
+            $ipInfo = file_get_contents('http://ip-api.com/json/' . $ip);
+            $ipInfo = json_decode($ipInfo);
+            $timezone = $ipInfo->timezone;
+            date_default_timezone_set($timezone);
+            date_default_timezone_get();
+            $data = Timer::whereDate('captured_at', $date)->select('image', 'captured_at')->get();
         } catch (Exception $e) {
             //throw exeption
             $message = $e->getMessage();
@@ -105,13 +121,13 @@ class TimerController extends Controller
             exit;
         }
         //get screenshots with specific date
-        return response()->json([$data]);
+        return response()->json($data, 200);
     }
-    public function alldata()
+    public function alldata(Request $request)
     {
         try {
-            $data = User::select('id', 'name', 'email')->with(['last_timer' => function($query) {
-                $query->select('user_id','created_at');
+            $data = User::select('id', 'name', 'email')->with(['last_timer' => function ($query) {
+                $query->select('user_id');
             }])->get();
         } catch (Exception $e) {
             //throw exeption
@@ -127,8 +143,6 @@ class TimerController extends Controller
             exit;
         }
         //get all users
-        return response()->json([$data]);
-    //    ->with('last_timer')
-
+        return response()->json($data, 200);
     }
 }
