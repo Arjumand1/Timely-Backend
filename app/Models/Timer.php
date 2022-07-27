@@ -47,7 +47,8 @@ class Timer extends Model
     {
         $timer = Timer::whereDate('started_at', Carbon::now()->toDateString())
             ->sum('total_time');
-        // $data = gmdate("H:i:s", $timer);
+
+        //$data = gmdate("H:i:s", $timer);
         //expected response
         return $timer;
     }

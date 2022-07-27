@@ -43,8 +43,15 @@ class TimerController extends Controller
 
             $data->started_at = $request['started_at'];
             $data->stopped_at = '00:00:00';
-            $time = $data->started_at->diffInSeconds($data->stopped_at);
-            $data->total_time = $time;
+
+            $timer = Timer::where('user_id', $id)->latest()->pluck('started_at')->first();
+            if ($timer != NULL || $timer != '' || $timer != []) {
+                $time = $timer->diffInSeconds($data->started_at);
+                $data->total_time = $time;
+            }
+            else{
+                $data->total_time=0;
+            }
             $data->captured_at = Carbon::parse(Str::substr($request['captured_at'], 0, 33));
 
             $data->save();
