@@ -57,7 +57,7 @@ class AuthController extends Controller
                 'token' => $token,
             ];
 
-      //      $message = "successfully registered as admin";
+            //      $message = "successfully registered as admin";
         } catch (Exception $e) {
             //thorw exception
             $message = $e->getMessage();
@@ -72,7 +72,7 @@ class AuthController extends Controller
             exit;
         }
         //it should provide all the data with token and message
-        return response()->json([$response],200);
+        return response()->json([$response], 200);
     }
 
     //this method will register an employee
@@ -115,7 +115,7 @@ class AuthController extends Controller
             //send mail with credentials
             Mail::to($employee)->send(new WelcomeMail($employee));
 
-        //    $message = 'Employee Registered And Mail sent Successfully';
+            //    $message = 'Employee Registered And Mail sent Successfully';
         } catch (Exception $e) {
             //throw exception
             $message = $e->getMessage();
@@ -130,7 +130,7 @@ class AuthController extends Controller
             exit;
         }
         //it should provide all the data with token and message
-        return response()->json([$employee],200);
+        return response()->json([$employee], 200);
     }
 
     //login
@@ -174,15 +174,18 @@ class AuthController extends Controller
             exit;
         }
         //it should provide data with token and message
-        return response()->json([$response],200);
+        return response()->json([$response], 200);
     }
 
     //user can logout through this method
-    public function logout()
+    public function logout(Request $request)
     {
         try {
             //delete token
-            auth()->user()->tokens()->delete();
+            $tokenId = request()->user()->currentAccessToken()->token;
+            //$tokenId= $request->bearerToken();
+            // return $tokenId;
+            $request->user()->tokens()->where('token', $tokenId)->delete();
         } catch (Exception $e) {
             //throw execption
             $message = $e->getMessage();
