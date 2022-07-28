@@ -45,7 +45,7 @@ class Timer extends Model
     //this should get daily_time
     public function getTodayTimeAttribute()
     {
-        $timer = Timer::whereDate('started_at', Carbon::now()->toDateString())
+        $timer = Timer::where('user_id', auth()->user()->id)->whereDate('started_at', Carbon::today()->toDateString())
             ->sum('total_time');
 
         //$data = gmdate("H:i:s", $timer);
@@ -56,7 +56,8 @@ class Timer extends Model
     //it would give weekly time
     public function getWeeklyTimeAttribute()
     {
-        $timer = Timer::whereBetween('started_at', [Carbon::now()->startOfWeek()->toDateString(), Carbon::today()->addDay()])
+
+        $timer = Timer::where('user_id', auth()->user()->id)->whereBetween('started_at', [Carbon::now()->startOfWeek()->subDay()->toDateString(), Carbon::today()->addDay()->toDateString()])
             ->sum('total_time');
         // $data = gmdate("H:i:s", $timer);
         //expected response
@@ -66,7 +67,7 @@ class Timer extends Model
     //it would give monthly time
     public function getMonthlyTimeAttribute()
     {
-        $timer = Timer::whereBetween('started_at', [Carbon::now()->startOfMonth()->toDateString(), Carbon::today()->addDay()])
+        $timer = Timer::where('user_id', auth()->user()->id)->whereBetween('started_at', [Carbon::now()->startOfMonth()->subDay()->toDateString(), Carbon::today()->addDay()])
             ->sum('total_time');
         // $data = gmdate("H:i:s", $timer);
         //expected response
