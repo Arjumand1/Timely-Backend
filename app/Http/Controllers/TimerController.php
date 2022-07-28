@@ -6,7 +6,6 @@ use App\Models\Timer;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-use DateTimeZone;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Exception;
@@ -16,12 +15,6 @@ class TimerController extends Controller
     //this method will store timer data with screenshot
     public function store(Request $request, $id)
     {
-        //  dd(
-        //     // $request['captured_at'],
-        //     // Str::substr($request['captured_at'], 0, 33),
-        // Carbon::parse(Str::substr($request['captured_at'], 0, 33))->setTimezone('GMT+5')
-
-        // );
         try {
             //validate the request
             $this->validate($request, [
@@ -48,9 +41,8 @@ class TimerController extends Controller
             if ($timer != NULL || $timer != '' || $timer != []) {
                 $time = $timer->diffInSeconds($data->started_at);
                 $data->total_time = $time;
-            }
-            else{
-                $data->total_time=0;
+            } else {
+                $data->total_time = 0;
             }
             $data->captured_at = Carbon::parse(Str::substr($request['captured_at'], 0, 33));
 
@@ -76,7 +68,6 @@ class TimerController extends Controller
     public function show($id)
     {
         try {
-
             $data = Timer::where('user_id', $id)
                 ->whereDate('started_at', Carbon::now()->toDateString())
                 ->select('id', 'started_at', 'stopped_at', 'total_time')->get();
@@ -130,7 +121,7 @@ class TimerController extends Controller
         //get screenshots with specific date
         return response()->json($data, 200);
     }
-    public function alldata(Request $request)
+    public function alldata()
     {
         try {
             $data = User::select('id', 'name', 'email')->with(['last_timer' => function ($query) {

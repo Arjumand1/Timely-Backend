@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Exception;
 
-
 class AuthController extends Controller
 {
     //this method will register an admin
