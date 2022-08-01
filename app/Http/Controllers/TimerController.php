@@ -38,12 +38,36 @@ class TimerController extends Controller
             $data->stopped_at = '00:00:00';
 
             $timer = Timer::where('user_id', $id)->latest()->pluck('started_at')->first();
+
             if ($timer != NULL || $timer != '' || $timer != []) {
                 $time = $timer->diffInSeconds($data->started_at);
                 $data->total_time = $time;
             } else {
                 $data->total_time = 0;
             }
+
+
+            $daily_time = Timer::where('user_id', $id)
+                ->whereDate('started_at', Carbon::today()->toDateString())
+                ->sum('total_time');
+
+            $data->daily_time = $daily_time + $data->total_time;
+
+
+
+            $weekly_time = Timer::where('user_id', $id)
+                ->whereBetween('started_at', [Carbon::now()->startOfWeek()->subDay()->toDateString(), Carbon::today()->addDay()->toDateString()])
+                ->sum('total_time');
+
+            $data->weekly_time = $weekly_time + $data->total_time;
+
+            $monthly_time = Timer::where('user_id', $id)
+                ->whereBetween('started_at', [Carbon::now()->startOfMonth()->subDay()->toDateString(), Carbon::today()->addDay()->toDateString()])
+                ->sum('total_time');
+
+            $data->monthly_time = $monthly_time + $data->total_time;
+
+
             $data->captured_at = Carbon::parse(Str::substr($request['captured_at'], 0, 33));
 
             $data->save();
@@ -64,13 +88,13 @@ class TimerController extends Controller
         return response()->json([$data], 200);
     }
 
-    //get daily daita of user
+    //get daily data of user
     public function show($id)
     {
         try {
             $data = Timer::where('user_id', $id)
                 ->whereDate('started_at', Carbon::now()->toDateString())
-                ->select('id', 'started_at', 'stopped_at', 'total_time')->get();
+                ->select('id', 'daily_time', 'weekly_time', 'monthly_time')->latest()->get();
         } catch (Exception $e) {
             //throw exeption
             $message = $e->getMessage();
@@ -86,7 +110,7 @@ class TimerController extends Controller
         }
         //if there is no data for today(present day) return previous time
         if ($data->isEmpty()) {
-            $time = Timer::where('user_id', $id)->select('total_time')->orderby('id', 'desc')->first();
+            $time = Timer::where('user_id', $id)->select('weekly_time', 'monthly_time')->orderby('id', 'desc')->first();
             return response()->json($time);
         }
 
@@ -133,8 +157,8 @@ class TimerController extends Controller
         if (auth()->user()->role == 0) {
             try {
 
-                $data = User::where('role', 1)->select('id', 'name', 'email')->with(['last_timer' => function ($query) {
-                    $query->select('user_id');
+                $data = User::select('id', 'name', 'email')->with(['last_timer' => function ($query) {
+                    $query->select('user_id', 'daily_time', 'weekly_time', 'monthly_time');
                 }])->get();
             } catch (Exception $e) {
                 //throw exeption
