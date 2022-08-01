@@ -40,7 +40,7 @@ Route::middleware('auth:sanctum')->group(function () {
         //get data
         Route::get('data/{id}', 'show');
         //screenshots record
-        route::get('image/{date}','view');
+        route::get('image/{id}/{date}','view');
         //alldata
         route::get('details','alldata');
 

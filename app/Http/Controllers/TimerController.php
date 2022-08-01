@@ -64,7 +64,7 @@ class TimerController extends Controller
         return response()->json([$data], 200);
     }
 
-    //this method will get timer info e.g daily time,weekly time, monthly time,screenshot image
+    //get daily daita of user
     public function show($id)
     {
         try {
@@ -93,54 +93,67 @@ class TimerController extends Controller
         //it will return the selected data with accessors created in Timer Model
         return response()->json($data, 200);
     }
-
-    public function view(Request $request, $date)
+    //get data of requested date,  screenshots and its captured date
+    public function view(Request $request, $date, $id)
     {
-        try {
-            $ip = $request->ip();
-            // $ip = "136.22.83.240"; //$_SERVER['REMOTE_ADDR'];
-            $ipInfo = file_get_contents('http://ip-api.com/json/' . $ip);
-            $ipInfo = json_decode($ipInfo);
-            $timezone = $ipInfo->timezone;
-            date_default_timezone_set($timezone);
-            date_default_timezone_get();
-            $data = Timer::whereDate('captured_at', $date)->select('image', 'captured_at')->get();
-        } catch (Exception $e) {
-            //throw exeption
-            $message = $e->getMessage();
-            var_dump('Exception Message: ' . $message);
+        if (auth()->user()->role == 0) {
+            try {
+                // $ip = $request->ip();
+                // // $ip = "136.22.83.240"; //$_SERVER['REMOTE_ADDR'];
+                // $ipInfo = file_get_contents('http://ip-api.com/json/' . $ip);
+                // $ipInfo = json_decode($ipInfo);
+                // $timezone = $ipInfo->timezone;
+                // date_default_timezone_set($timezone);
+                // date_default_timezone_get();
 
-            $code = $e->getCode();
-            var_dump('Exception Code: ' . $code);
+                $data = Timer::where('user_id', $id)->whereDate('captured_at', $date)->select('image', 'captured_at')->get();
+            } catch (Exception $e) {
+                //throw exeption
+                $message = $e->getMessage();
+                var_dump('Exception Message: ' . $message);
 
-            $string = $e->__toString();
-            var_dump('Exception String: ' . $string);
+                $code = $e->getCode();
+                var_dump('Exception Code: ' . $code);
 
-            exit;
+                $string = $e->__toString();
+                var_dump('Exception String: ' . $string);
+
+                exit;
+            }
+            //get screenshots with specific date
+            return response()->json($data, 200);
+        } else {
+            $message = 'Unauthorized';
+            return response()->json($message, 403);
         }
-        //get screenshots with specific date
-        return response()->json($data, 200);
     }
+    //get all users with their weekly
     public function alldata()
     {
-        try {
-            $data = User::select('id', 'name', 'email')->with(['last_timer' => function ($query) {
-                $query->select('user_id');
-            }])->get();
-        } catch (Exception $e) {
-            //throw exeption
-            $message = $e->getMessage();
-            var_dump('Exception Message: ' . $message);
+        if (auth()->user()->role == 0) {
+            try {
 
-            $code = $e->getCode();
-            var_dump('Exception Code: ' . $code);
+                $data = User::where('role', 1)->select('id', 'name', 'email')->with(['last_timer' => function ($query) {
+                    $query->select('user_id');
+                }])->get();
+            } catch (Exception $e) {
+                //throw exeption
+                $message = $e->getMessage();
+                var_dump('Exception Message: ' . $message);
 
-            $string = $e->__toString();
-            var_dump('Exception String: ' . $string);
+                $code = $e->getCode();
+                var_dump('Exception Code: ' . $code);
 
-            exit;
+                $string = $e->__toString();
+                var_dump('Exception String: ' . $string);
+
+                exit;
+            }
+            //get all users
+            return response()->json($data, 200);
+        } else {
+            $message = 'Unauthorized';
+            return response()->json($message, 403);
         }
-        //get all users
-        return response()->json($data, 200);
     }
 }

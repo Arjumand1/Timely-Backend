@@ -77,6 +77,7 @@ class AuthController extends Controller
     //this method will register an employee
     public function employeecreate(Request $request)
     {
+        if (auth()->user()->role == 0) {
         try {
             //validate the request
             $request->validate(
@@ -112,7 +113,7 @@ class AuthController extends Controller
                 'role' => 1,
             ]);
             //send mail with credentials
-            Mail::to($employee)->send(new WelcomeMail($employee));
+        //    Mail::to($employee)->send(new WelcomeMail($employee));
 
             //    $message = 'Employee Registered And Mail sent Successfully';
         } catch (Exception $e) {
@@ -130,6 +131,10 @@ class AuthController extends Controller
         }
         //it should provide all the data with token and message
         return response()->json([$employee], 200);
+    } else {
+        $message = 'Unauthorized';
+        return response()->json($message, 403);
+    }
     }
 
     //login
