@@ -46,17 +46,19 @@ class AuthController extends Controller
                 'company_img' => $request->company_img,
                 'address' => $request->address,
                 'country' => $request->country,
-                'role' => 0,   //0 role defined for admins only
+                'role' => 0,   //admin
             ]);
 
             //generate token
             $token = $data->createToken('my_Token')->plainTextToken;
+
             $response = [
                 'data' => $data,
                 'token' => $token,
             ];
 
-            //      $message = "successfully registered as admin";
+            //response expected
+            return response()->json([$response], 200);
         } catch (Exception $e) {
             //thorw exception
             $message = $e->getMessage();
@@ -70,71 +72,67 @@ class AuthController extends Controller
 
             exit;
         }
-        //it should provide all the data with token and message
-        return response()->json([$response], 200);
     }
 
     //this method will register an employee
     public function employeecreate(Request $request)
     {
         if (auth()->user()->role == 0) {
-        try {
-            //validate the request
-            $request->validate(
-                [
-                    'name' => 'required',
-                    'department' => 'required',
-                    'email' => 'required',
-                    'password' => [
-                        'required',
-                        'string',
-                        'min:8',             // must be at least 08 characters in length
-                        'regex:/[a-z]/',      // must contain at least one lowercase letter
-                        'regex:/[A-Z]/',      // must contain at least one uppercase letter
-                        'regex:/[0-9]/',      // must contain at least one digit
-                        'regex:/[@$!%*#?&]/', // must contain a special character
+            try {
+                //validate the request
+                $request->validate(
+                    [
+                        'name' => 'required',
+                        'department' => 'required',
+                        'email' => 'required',
+                        'password' => [
+                            'required',
+                            'string',
+                            'min:8',             // must be at least 08 characters in length
+                            'regex:/[a-z]/',      // must contain at least one lowercase letter
+                            'regex:/[A-Z]/',      // must contain at least one uppercase letter
+                            'regex:/[0-9]/',      // must contain at least one digit
+                            'regex:/[@$!%*#?&]/', // must contain a special character
+                        ],
+                        'designation' => 'required'
                     ],
-                    'designation' => 'required'
-                ],
-                [
-                    'password.min' => 'password must not be greater than eight characters',
-                    'password.regex' => '1:must conatain one small alphabet ' . ' 2:must conatain one big alphabet' . ' 3:must conatain a numeric digit' . ' 4:must contain one special character (! @ # $ %)',
-                ]
-            );
-            //create employee
+                    [
+                        'password.min' => 'password must not be greater than eight characters',
+                        'password.regex' => '1:must conatain one small alphabet ' . ' 2:must conatain one big alphabet' . ' 3:must conatain a numeric digit' . ' 4:must contain one special character (! @ # $ %)',
+                    ]
+                );
 
-            $employee = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'department' => $request->department,
-                'image' => $request->image,
-                'designation' => $request->designation,
-                'role' => 1,
-            ]);
-            //send mail with credentials
-        //    Mail::to($employee)->send(new WelcomeMail($employee));
+                //create employee
+                $employee = User::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'password' => Hash::make($request->password),
+                    'department' => $request->department,
+                    'image' => $request->image,
+                    'designation' => $request->designation,
+                    'role' => 1,
+                ]);
 
-            //    $message = 'Employee Registered And Mail sent Successfully';
-        } catch (Exception $e) {
-            //throw exception
-            $message = $e->getMessage();
-            var_dump('Exception Message: ' . $message);
+                //    Mail::to($employee)->send(new WelcomeMail($employee));
 
-            $code = $e->getCode();
-            var_dump('Exception Code: ' . $code);
+                //expected response
+                return response()->json([$employee], 200);
+            } catch (Exception $e) {
+                //throw exception
+                $message = $e->getMessage();
+                var_dump('Exception Message: ' . $message);
 
-            $string = $e->__toString();
-            var_dump('Exception String: ' . $string);
+                $code = $e->getCode();
+                var_dump('Exception Code: ' . $code);
 
-            exit;
+                $string = $e->__toString();
+                var_dump('Exception String: ' . $string);
+
+                exit;
+            }
+        } else {
+            return response()->json(['message' => 'Unauthorized.'], 403);
         }
-        //it should provide all the data with token and message
-        return response()->json([$employee], 200);
-    } else {
-        $message = 'Unauthorized';
-        return response()->json($message, 403);
-    }
     }
 
     //login
@@ -145,11 +143,10 @@ class AuthController extends Controller
             $request->validate([
                 'email' => 'required|email',
                 'password' => 'required',
-
             ]);
 
             $user = User::where('email', $request->email)->first();
-            //Auth failed
+
             if (!$user || !Hash::check($request->password, $user->password)) {
                 return response([
                     'message' => 'The provided credentials are incorrect.'
@@ -163,7 +160,8 @@ class AuthController extends Controller
                 'token' => $token
             ];
 
-            // $message = 'Successfully logged in ';
+            //expected response
+            return response()->json([$response], 200);
         } catch (Exception $e) {
             //throw execption
             $message = $e->getMessage();
@@ -177,16 +175,18 @@ class AuthController extends Controller
 
             exit;
         }
-        //it should provide data with token and message
-        return response()->json([$response], 200);
     }
 
     //user can logout through this method
     public function logout(Request $request)
     {
         try {
-            $tokenId = request()->user()->currentAccessToken()->token;
-            $request->user()->tokens()->where('token', $tokenId)->delete();
+            $token = request()->user()->currentAccessToken()->token;
+            $request->user()->tokens()->where('token', $token)->delete();
+            // expected response
+            return response([
+                'message' => 'Succefully Logged Out !!'
+            ], 200);
         } catch (Exception $e) {
             //throw execption
             $message = $e->getMessage();
@@ -200,10 +200,5 @@ class AuthController extends Controller
 
             exit;
         }
-        // expected response
-        return response([
-            'message' => 'Succefully Logged Out !!'
-
-        ], 200);
     }
 }

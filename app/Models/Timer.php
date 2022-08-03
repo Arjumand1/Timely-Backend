@@ -20,17 +20,12 @@ class Timer extends Model
         'monthly_time',
         'image',
     ];
-    //changing datatype of two fields from string to timezone
-    protected $casts = [
 
+    protected $casts = [
         'started_at' => 'datetime',
         'stopped_at' => 'datetime',
-
-        // 'captured_at' => 'datetime'
-
     ];
 
-    //one-to-one relation with User model
     public function users()
     {
         return  $this->belongsTo(User::class);

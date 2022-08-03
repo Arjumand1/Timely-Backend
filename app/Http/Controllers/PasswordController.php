@@ -16,7 +16,7 @@ class PasswordController extends Controller
     {
         //validate the request
         $request->validate(['email' => 'required|email']);
-        //sent password reset link
+        //send password reset link
         $status = password::sendResetLink(
             $request->only('email')
         );
@@ -27,8 +27,7 @@ class PasswordController extends Controller
             return response()->json([$message]);
         }
         //error
-        $message = 'operation failed...';
-        return response()->json([$message]);
+        return response()->json(['message' => 'Operation failed....'], 404);
     }
 
     //this method will allow you to create new password
@@ -48,7 +47,7 @@ class PasswordController extends Controller
                 'regex:/[@$!%*#?&]/', // must contain a special character
                 'confirmed'
             ],
-        ],[
+        ], [
             'password.min' => 'password must not be greater than eight characters',
             'password.regex' => '1:must conatain one small alphabet ' . ' 2:must conatain one big alphabet' . ' 3:must conatain a numeric digit' . ' 4:must contain one special character (! @ # $ %)',
         ]);
@@ -70,7 +69,6 @@ class PasswordController extends Controller
             return response()->json([$message]);
         }
         //error
-        $message = 'Operation Failed...';
-        return response()->json([$message]);
+        return response()->json(['message' => 'Operation failed....']);
     }
 }

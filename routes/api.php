@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PasswordController;
@@ -40,10 +39,9 @@ Route::middleware('auth:sanctum')->group(function () {
         //get data
         Route::get('data/{id}', 'show');
         //screenshots record
-        route::get('image/{id}/{date}','view');
+        route::get('image/{id}/{date}', 'view');
         //alldata
-        route::get('details','alldata');
-
+        route::get('details', 'alldata');
     });
 });
 
@@ -54,5 +52,3 @@ Route::controller(PasswordController::class)->group(function () {
     //reset password
     Route::post('reset-password', 'reset')->name('password.reset');
 });
-
-

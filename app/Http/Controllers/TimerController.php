@@ -17,7 +17,7 @@ class TimerController extends Controller
     {
         try {
             //validate the request
-            $this->validate($request, [
+            $request->validate([
                 'image' => 'required',
                 'started_at' => 'required',
                 'captured_at' => 'required'
@@ -26,6 +26,7 @@ class TimerController extends Controller
             //create timer
             $data = new Timer;
             $data->user_id = $id;
+
             //base64 string to image conversion
             preg_match("/data:image\/(.*?);/", $request->image, $image_extension); // extract the image extension
             $image = preg_replace('/data:image\/(.*?);base64,/', '', $request->image); // remove the type part
@@ -37,40 +38,43 @@ class TimerController extends Controller
             $data->started_at = $request['started_at'];
             $data->stopped_at = '00:00:00';
 
+            //total time
             $timer = Timer::where('user_id', $id)->latest()->pluck('started_at')->first();
-
             if ($timer != NULL || $timer != '' || $timer != []) {
-                $time = $timer->diffInSeconds($data->started_at);
-                $data->total_time = $time;
+                if ($data->started_at == $data->stopped_at) {
+                    $data->total_time = 0;
+                } else {
+                    $time = $timer->diffInSeconds($data->started_at);
+                    $data->total_time = $time;
+                }
             } else {
                 $data->total_time = 0;
             }
 
-
+            //daily time
             $daily_time = Timer::where('user_id', $id)
                 ->whereDate('started_at', Carbon::today()->toDateString())
                 ->sum('total_time');
-
             $data->daily_time = $daily_time + $data->total_time;
 
-
-
+            //weekly time
             $weekly_time = Timer::where('user_id', $id)
                 ->whereBetween('started_at', [Carbon::now()->startOfWeek()->subDay()->toDateString(), Carbon::today()->addDay()->toDateString()])
                 ->sum('total_time');
-
             $data->weekly_time = $weekly_time + $data->total_time;
 
+            //monthly time
             $monthly_time = Timer::where('user_id', $id)
                 ->whereBetween('started_at', [Carbon::now()->startOfMonth()->subDay()->toDateString(), Carbon::today()->addDay()->toDateString()])
                 ->sum('total_time');
-
             $data->monthly_time = $monthly_time + $data->total_time;
-
 
             $data->captured_at = Carbon::parse(Str::substr($request['captured_at'], 0, 33));
 
             $data->save();
+
+            //expected response
+            return response()->json([$data], 200);
         } catch (Exception $e) {
             //throw execption
             $message = $e->getMessage();
@@ -84,8 +88,6 @@ class TimerController extends Controller
 
             exit;
         }
-        //expected response
-        return response()->json([$data], 200);
     }
 
     //get daily data of user
@@ -95,6 +97,14 @@ class TimerController extends Controller
             $data = Timer::where('user_id', $id)
                 ->whereDate('started_at', Carbon::now()->toDateString())
                 ->select('id', 'daily_time', 'weekly_time', 'monthly_time')->latest()->get();
+
+            if ($data->isEmpty()) {
+                $time = Timer::where('user_id', $id)->select('weekly_time', 'monthly_time')->orderby('id', 'desc')->first();
+                return response()->json($time);
+            }
+
+            //expected response
+            return response()->json($data, 200);
         } catch (Exception $e) {
             //throw exeption
             $message = $e->getMessage();
@@ -108,14 +118,6 @@ class TimerController extends Controller
 
             exit;
         }
-        //if there is no data for today(present day) return previous time
-        if ($data->isEmpty()) {
-            $time = Timer::where('user_id', $id)->select('weekly_time', 'monthly_time')->orderby('id', 'desc')->first();
-            return response()->json($time);
-        }
-
-        //it will return the selected data with accessors created in Timer Model
-        return response()->json($data, 200);
     }
     //get data of requested date,  screenshots and its captured date
     public function view(Request $request, $date, $id)
@@ -123,7 +125,7 @@ class TimerController extends Controller
         if (auth()->user()->role == 0) {
             try {
                 // $ip = $request->ip();
-                // // $ip = "136.22.83.240"; //$_SERVER['REMOTE_ADDR'];
+                // $ip = "136.22.83.240"; //$_SERVER['REMOTE_ADDR'];
                 // $ipInfo = file_get_contents('http://ip-api.com/json/' . $ip);
                 // $ipInfo = json_decode($ipInfo);
                 // $timezone = $ipInfo->timezone;
@@ -131,6 +133,9 @@ class TimerController extends Controller
                 // date_default_timezone_get();
 
                 $data = Timer::where('user_id', $id)->whereDate('captured_at', $date)->select('image', 'captured_at')->get();
+
+                //expected response
+                return response()->json($data, 200);
             } catch (Exception $e) {
                 //throw exeption
                 $message = $e->getMessage();
@@ -144,22 +149,21 @@ class TimerController extends Controller
 
                 exit;
             }
-            //get screenshots with specific date
-            return response()->json($data, 200);
         } else {
-            $message = 'Unauthorized';
-            return response()->json($message, 403);
+            return response()->json(['message' => 'Unauthorized'], 403);
         }
     }
-    //get all users with their weekly
+    //get all users
     public function alldata()
     {
         if (auth()->user()->role == 0) {
             try {
-
                 $data = User::select('id', 'name', 'email')->with(['last_timer' => function ($query) {
                     $query->select('user_id', 'daily_time', 'weekly_time', 'monthly_time');
                 }])->get();
+
+                //expected response
+                return response()->json($data, 200);
             } catch (Exception $e) {
                 //throw exeption
                 $message = $e->getMessage();
@@ -173,11 +177,8 @@ class TimerController extends Controller
 
                 exit;
             }
-            //get all users
-            return response()->json($data, 200);
         } else {
-            $message = 'Unauthorized';
-            return response()->json($message, 403);
+            return response()->json(['message'=>'Unauthorized'], 403);
         }
     }
 }

@@ -51,15 +51,12 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-
     ];
 
-    //hasMany relationship with timers model
     public function timers()
     {
         return $this->hasMany(Timer::class, 'user_id', 'id');
     }
-    //hasOne relationship with timers model
     public function last_timer()
     {
         return $this->hasOne(Timer::class)->orderBy('id', 'desc');
