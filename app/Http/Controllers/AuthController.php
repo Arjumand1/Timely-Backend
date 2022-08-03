@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Exception;
+use Illuminate\Validation\Rules\Password;
 
 class AuthController extends Controller
 {
@@ -19,23 +20,11 @@ class AuthController extends Controller
             $request->validate([
                 'name' => 'required',
                 'email' => 'required',
-                'password' => [
-                    'required',
-                    'string',
-                    'min:8',             // must be at least 08 characters in length
-                    'regex:/[a-z]/',      // must contain at least one lowercase letter
-                    'regex:/[A-Z]/',      // must contain at least one uppercase letter
-                    'regex:/[0-9]/',      // must contain at least one digit
-                    'regex:/[@$!%*#?&]/', // must contain a special character
-                ],
+                'password' => ['required', Password::min(8)->letters()->mixedCase()->symbols()->numbers()->uncompromised()],
                 'company_name' => 'required',
                 'address' => 'required',
                 'country' => 'required'
-            ], [
-                'password.min' => 'password must not be greater than eight characters',
-                'password.regex' => '1:must conatain one small alphabet ' . ' 2:must conatain one big alphabet' . ' 3:must conatain a numeric digit' . ' 4:must contain one special character (! @ # $ %)',
             ]);
-
 
             //create employee
             $data = User::create([
@@ -85,21 +74,9 @@ class AuthController extends Controller
                         'name' => 'required',
                         'department' => 'required',
                         'email' => 'required',
-                        'password' => [
-                            'required',
-                            'string',
-                            'min:8',             // must be at least 08 characters in length
-                            'regex:/[a-z]/',      // must contain at least one lowercase letter
-                            'regex:/[A-Z]/',      // must contain at least one uppercase letter
-                            'regex:/[0-9]/',      // must contain at least one digit
-                            'regex:/[@$!%*#?&]/', // must contain a special character
-                        ],
+                        'password' => ['required', Password::min(8)->letters()->mixedCase()->symbols()->numbers()->uncompromised()],
                         'designation' => 'required'
                     ],
-                    [
-                        'password.min' => 'password must not be greater than eight characters',
-                        'password.regex' => '1:must conatain one small alphabet ' . ' 2:must conatain one big alphabet' . ' 3:must conatain a numeric digit' . ' 4:must contain one special character (! @ # $ %)',
-                    ]
                 );
 
                 //create employee

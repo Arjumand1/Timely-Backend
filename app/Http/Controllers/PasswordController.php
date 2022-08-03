@@ -37,19 +37,7 @@ class PasswordController extends Controller
         $request->validate([
             'token' => "required",
             'email' => 'required|email',
-            'password' => [
-                'required',
-                'string',
-                'min:8',             // must be at least 08 characters in length
-                'regex:/[a-z]/',      // must contain at least one lowercase letter
-                'regex:/[A-Z]/',      // must contain at least one uppercase letter
-                'regex:/[0-9]/',      // must contain at least one digit
-                'regex:/[@$!%*#?&]/', // must contain a special character
-                'confirmed'
-            ],
-        ], [
-            'password.min' => 'password must not be greater than eight characters',
-            'password.regex' => '1:must conatain one small alphabet ' . ' 2:must conatain one big alphabet' . ' 3:must conatain a numeric digit' . ' 4:must contain one special character (! @ # $ %)',
+            'password' => ['required',Password::min(8)->letters()->mixedCase()->symbols()->numbers()->uncompromised(),'confirmed'],
         ]);
         //reset password
         $status = Password::reset(
