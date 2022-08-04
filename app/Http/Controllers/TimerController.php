@@ -100,7 +100,7 @@ class TimerController extends Controller
 
             if ($data->isEmpty()) {
                 $time = Timer::where('user_id', $id)->select('weekly_time', 'monthly_time')->orderby('id', 'desc')->first();
-                return response()->json($time);
+                return response()->json([$time], 200);
             }
 
             //expected response
@@ -178,7 +178,7 @@ class TimerController extends Controller
                 exit;
             }
         } else {
-            return response()->json(['message'=>'Unauthorized'], 403);
+            return response()->json(['message' => 'Unauthorized'], 403);
         }
     }
 }
