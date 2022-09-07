@@ -7,6 +7,7 @@
     "require": {
         "php": "^8.0.2",
         "astatroth/laravel-timer": "dev-master",
+        "doctrine/dbal": "^3.4",
         "guzzlehttp/guzzle": "^7.2",
         "intervention/image": "^2.7",
         "itsgoingd/clockwork": "^5.1",
