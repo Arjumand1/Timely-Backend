@@ -3,7 +3,7 @@
 
 You can download our application from
 
-@component('mail::button', ['url' => 'http://attendance.vastmesh.com/en/timesheet/'])
+@component('mail::button', ['url' => 'http://google.com'])
 Here
 @endcomponent
 

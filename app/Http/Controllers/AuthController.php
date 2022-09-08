@@ -47,7 +47,7 @@ class AuthController extends Controller
             ];
 
             //response expected
-            return response()->json([$response], 200);
+            return response()->json($response, 200);
         } catch (Exception $e) {
             //thorw exception
             $message = $e->getMessage();
@@ -87,13 +87,13 @@ class AuthController extends Controller
                     'department' => $request->department,
                     'image' => $request->image,
                     'designation' => $request->designation,
-                    'role' => 1,
+                    'role' => 1, //employee
                 ]);
 
-                //    Mail::to($employee)->send(new WelcomeMail($employee));
+                Mail::to($employee)->send(new WelcomeMail($employee));
 
                 //expected response
-                return response()->json([$employee], 200);
+                return response()->json($employee, 200);
             } catch (Exception $e) {
                 //throw exception
                 $message = $e->getMessage();
@@ -138,7 +138,7 @@ class AuthController extends Controller
             ];
 
             //expected response
-            return response()->json([$response], 200);
+            return response()->json($response, 200);
         } catch (Exception $e) {
             //throw execption
             $message = $e->getMessage();
@@ -162,7 +162,7 @@ class AuthController extends Controller
             $request->user()->tokens()->where('token', $token)->delete();
             // expected response
             return response([
-                'message' => 'Succefully Logged Out !!'
+                'message' => 'Logged Out Succefully!!'
             ], 200);
         } catch (Exception $e) {
             //throw execption

@@ -17,3 +17,8 @@ use Illuminate\Support\Facades\Artisan;
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
+
+Artisan::command("hello",function(){
+    $url = 'routes/console.php';
+    $this->comment("Hello Developer welcome to our application.\n This Command has been created in $url"); 
+});

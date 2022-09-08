@@ -24,7 +24,7 @@ class PasswordController extends Controller
         if ($status == Password::RESET_LINK_SENT) {
             $message = __($status);
             //expected response
-            return response()->json([$message]);
+            return response()->json($message, 200);
         }
         //error
         return response()->json(['message' => 'Operation failed....'], 404);
@@ -37,7 +37,7 @@ class PasswordController extends Controller
         $request->validate([
             'token' => "required",
             'email' => 'required|email',
-            'password' => ['required',Password::min(8)->letters()->mixedCase()->symbols()->numbers()->uncompromised(),'confirmed'],
+            'password' => ['required', Password::min(8)->letters()->mixedCase()->symbols()->numbers()->uncompromised(), 'confirmed'],
         ]);
         //reset password
         $status = Password::reset(
@@ -54,9 +54,9 @@ class PasswordController extends Controller
         if ($status == Password::PASSWORD_RESET) {
             $message = __($status);
             //expected response
-            return response()->json([$message]);
+            return response()->json($message, 200);
         }
         //error
-        return response()->json(['message' => 'Operation failed....']);
+        return response()->json(['message' => 'Operation failed....'], 404);
     }
 }
