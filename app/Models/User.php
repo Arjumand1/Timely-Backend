@@ -57,8 +57,5 @@ class User extends Authenticatable
     {
         return $this->hasMany(Timer::class, 'user_id', 'id');
     }
-    public function last_timer()
-    {
-        return $this->hasOne(Timer::class)->orderBy('id', 'desc');
-    }
+    
 }

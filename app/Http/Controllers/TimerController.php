@@ -103,7 +103,20 @@ class TimerController extends Controller
     {
         if (auth()->user()->role == 0) {
             try {
-                $data = User::select('id', 'name', 'email')->get();
+                $data = User::select('id', 'name', 'email')
+                //daily time 
+                ->withSum(['timers as daily_time'=>function($query){
+                    $query->whereDate('captured_at',Carbon::now()->toDateString());
+                }],'time_diff')
+                //weekly time
+                ->withSum(['timers as weekly_time'=>function($query){
+                    $query->whereBetween('captured_at', [Carbon::now()->startOfWeek()->subDay()->toDateString(), Carbon::today()->addDay()->toDateString()]);
+                }],'time_diff')
+                //monthly time
+                ->withSum(['timers as monthly_time'=>function($query){
+                    $query->whereBetween('captured_at', [Carbon::now()->startOfMonth()->subDay()->toDateString(), Carbon::today()->addDay()->toDateString()]);
+                }],'time_diff')
+                ->get();
 
                 //expected response
                 return response()->json($data, 200);
