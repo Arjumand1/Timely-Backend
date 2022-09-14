@@ -16,13 +16,8 @@ return new class extends Migration
         Schema::create('timers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained();
-            $table->string('image')->nullable();
-            $table->string('started_at')->nullable();
-            $table->string('stopped_at')->nullable();
-            $table->bigInteger('total_time')->nullable();
-            $table->bigInteger('daily_time')->nullable();
-            $table->bigInteger('weekly_time')->nullable();
-            $table->bigInteger('monthly_time')->nullable();
+            $table->string('screenshot')->nullable();
+            $table->bigInteger('time_diff');            
             $table->string('captured_at')->nullable();
             $table->timestamps();
         });

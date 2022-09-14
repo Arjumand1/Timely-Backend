@@ -18,8 +18,8 @@ class TimerController extends Controller
         try {
             //validate the request
             $request->validate([
-                'image' => 'required',
-                'started_at' => 'required',
+                'screenshot' => 'required',
+                'time_diff' => 'required',
                 'captured_at' => 'required'
             ]);
 
@@ -28,52 +28,16 @@ class TimerController extends Controller
             $data->user_id = $id;
 
             //base64 string to image conversion
-            preg_match("/data:image\/(.*?);/", $request->image, $image_extension); // extract the image extension
-            $image = preg_replace('/data:image\/(.*?);base64,/', '', $request->image); // remove the type part
+            preg_match("/data:image\/(.*?);/", $request->screenshot, $image_extension); // extract the image extension
+            $image = preg_replace('/data:image\/(.*?);base64,/', '', $request->screenshot); // remove the type part
             $image = str_replace(' ', '+', $image);
             $imageName = 'image_' . Str::random(20) . '.' . @$image_extension[1]; //generating unique file name;
-            $data->image = $imageName;
+            $data->screenshot = $imageName;
             Storage::disk('public')->put($imageName, base64_decode($image)); // image base64 encoded
 
-            $data->started_at = $request['started_at'];
-            $data->stopped_at = '00:00:00';
 
-            //total time
-            $timer = Timer::where('user_id', $id)
-                ->whereDate('started_at', Carbon::today()->toDateString())
-                ->latest()->pluck('started_at')->first();
-            if ($timer != NULL || $timer != '' || $timer != []) {
-                $data->started_at == $data->stopped_at
-                    ?  $data->total_time = 0
-                    :  $time = $timer->diffInSeconds($data->started_at);
-                $data->total_time = $time;
-            } else {
-                $data->total_time = 0;
-            }
-
-            //daily time
-            $daily_time = Timer::where('user_id', $id)
-                ->whereDate('started_at', Carbon::today()->toDateString())
-                ->sum('total_time');
-            $data->daily_time = $daily_time + $data->total_time;
-
-            //weekly time
-            $weekly_time = Timer::where('user_id', $id)
-                ->whereBetween(
-                    'started_at',
-                    [Carbon::now()->startOfWeek()->subDay()->toDateString(), Carbon::today()->addDay()->toDateString()]
-                )
-                ->sum('total_time');
-            $data->weekly_time = $weekly_time + $data->total_time;
-
-            //monthly time
-            $monthly_time = Timer::where('user_id', $id)
-                ->whereBetween(
-                    'started_at',
-                    [Carbon::now()->startOfMonth()->subDay()->toDateString(), Carbon::today()->addDay()->toDateString()]
-                )
-                ->sum('total_time');
-            $data->monthly_time = $monthly_time + $data->total_time;
+            //time difference
+            $data->time_diff = $request->time_diff;
 
             //ScreenShot Captured Date
             $data->captured_at = Carbon::parse(Str::substr($request['captured_at'], 0, 33));
@@ -99,23 +63,26 @@ class TimerController extends Controller
     //get daily data of user
     public function show($id)
     {
-        try {            
-            $data = Timer::where('user_id', $id)
-                ->whereDate('started_at', Carbon::now()->toDateString())
-                ->select('id', 'daily_time', 'weekly_time', 'monthly_time')->latest()->get();
-            if ($data->isEmpty()) {
+        try {
+            //daily time 
+            $daily_time = Timer::where('user_id', $id)->whereDate('captured_at', Carbon::now()->toDateString())->sum('time_diff');
+            //weekly time 
+            $weekly_time = Timer::where('user_id', $id)
+                ->whereBetween('captured_at', [Carbon::now()->startOfWeek()->subDay()->toDateString(), Carbon::today()->addDay()->toDateString()])
+                ->sum('time_diff');
+            //month time 
+            $monthly_time = Timer::where('user_id', $id)
+                ->whereBetween('captured_at', [Carbon::now()->startOfMonth()->subDay()->toDateString(), Carbon::today()->addDay()->toDateString()])
+                ->sum('time_diff');
+            //response 
+            $response = [
+                'daily_time' => $daily_time,
+                'weekly_time' => $weekly_time,
+                'monthly_time' => $monthly_time
+            ];
 
-                $time = Timer::where('user_id', $id)
-                    ->select('daily_time', 'weekly_time', 'monthly_time')
-                    ->orderby('id', 'desc')->first();
-                if ($time->daily_time > 0) {
-                    $time->daily_time = 0;
-                };
-                return response()->json($time, 200);
-            }
-
-            //expected response
-            return response()->json($data, 200);
+            return response()->json($response, 200);
+            
         } catch (Exception $e) {
             //throw exeption
             $message = $e->getMessage();
@@ -130,12 +97,14 @@ class TimerController extends Controller
             exit;
         }
     }
-    //get data of requested date,  screenshots and its captured date
-    public function view($date, $id)
+
+    //get all users
+    public function alldata()
     {
         if (auth()->user()->role == 0) {
             try {
-                $data = Timer::where('user_id', $id)->whereDate('captured_at', $date)->select('image', 'captured_at')->get();
+                $data = User::select('id', 'name', 'email')->get();
+
                 //expected response
                 return response()->json($data, 200);
             } catch (Exception $e) {
@@ -155,16 +124,13 @@ class TimerController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
     }
-    //get all users
-    public function alldata()
+
+    //get data of requested date,  screenshots and its captured date
+    public function view($date, $id)
     {
         if (auth()->user()->role == 0) {
             try {
-                $data = User::select('id', 'name', 'email')
-                    ->with(['last_timer' => function ($query) {
-                        $query->select('user_id', 'daily_time', 'weekly_time', 'monthly_time');
-                    }])->get();
-
+                $data = Timer::where('user_id', $id)->whereDate('captured_at', $date)->select('screenshot', 'captured_at')->get();
                 //expected response
                 return response()->json($data, 200);
             } catch (Exception $e) {

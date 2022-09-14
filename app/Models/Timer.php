@@ -11,29 +11,20 @@ class Timer extends Model
 
     protected $fillable = [
         'user_id',
-        'started_at',
         'stopped_at',
-        'captured_at',
-        'total_time',
-        'daily_time',
-        'weekly_time',
-        'monthly_time',
-        'image',
+        'time_diff',
+        'captured_at',       
+        'screenshot',
     ];
 
-    protected $casts = [
-        'started_at' => 'datetime',
-        'stopped_at' => 'datetime',
-    ];
+ 
 
-    public function users()
+    public function user()
     {
         return  $this->belongsTo(User::class);
     }
 
     protected $dates = [
-        'started_at',
-        'stopped_at',
         'captured_at'
     ];
 }
