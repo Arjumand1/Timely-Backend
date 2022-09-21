@@ -15,6 +15,7 @@ class Timer extends Model
         'time_diff',
         'captured_at',       
         'screenshot',
+        'task_id',
     ];
 
  
@@ -22,6 +23,10 @@ class Timer extends Model
     public function user()
     {
         return  $this->belongsTo(User::class);
+    }
+    public function task()
+    {
+        return  $this->belongsTo(Task::class);
     }
 
     protected $dates = [

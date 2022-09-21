@@ -58,4 +58,10 @@ class User extends Authenticatable
         return $this->hasMany(Timer::class, 'user_id', 'id');
     }
     
+    
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
+    
 }

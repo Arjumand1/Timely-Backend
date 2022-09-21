@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TimerController;
 
 /*
@@ -32,12 +33,19 @@ Route::middleware('auth:sanctum')->group(function () {
         //employee signup form
         Route::post('employee-signup', 'employeecreate');
     });
+
+    //task controller
+    Route::controller(TaskController::class)->group(function (){
+         Route::post('task','store');
+         Route::get('task','show');
+    });
+
     //timer controller
     Route::controller(TimerController::class)->group(function () {
         //store data
-        Route::post('timer/{id}', 'store')->middleware('throttle:15');
+        Route::post('timer', 'store')->middleware('throttle:15');
         //get data
-        Route::get('data/{id}', 'show');
+        Route::get('timer', 'show');
         //screenshots record
         route::get('image/{id}/{date}', 'view');
         //alldata
