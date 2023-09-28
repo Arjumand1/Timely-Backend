@@ -32,7 +32,7 @@ class PasswordController extends Controller
     }
 
     //this method will allow you to create new password
-    public function reset(request $request)
+    public function reset(Request $request)
     {
         //validate the request
         $request->validate([

@@ -15,23 +15,17 @@ class TaskController extends Controller
             return response()->json($task, 200);
             $token = $data->createToken('my_Token')->plainTextToken;
             $response = [
-                'data' => $user,
+                'user' => $user,
                 'token' => $token,
             ];
+            $message=trans('messege.store_task');
             //response expected
-            return response()->json($response, 200);
-          /*  $request->validate([
-                'task_desc' => 'required',
-                'task_title' => 'required'
+            return response()->json([
+               'Messege'=>$message,
+               'data'=>$response,
+               'status'=>200,
             ]);
-            
-            $data = new Task;            
-            $data->user_id = auth()->user()->id;
-            $data->task_desc = $request->task_desc;
-            $data->task_title = $request->task_title;
-            $data->save();
 
-            return response()->json($data, 200);*/
         } catch (Exception $e) {
             $message = $e->getMessage();
             var_dump('Exception Message: ' . $message);
@@ -51,7 +45,12 @@ class TaskController extends Controller
     {
         try {
             $tasks = Task::where('user_id', auth()->user()->id)->get();
-            return response()->json($tasks, 200);
+            $message=trans('messege.get_tasks');
+            return response()->json([
+            'Messege'=>$message,
+            'data'=>$task,
+            'status'=>200,
+            ]);
         } catch (Exception $e) {
             $message = $e->getMessage();
             var_dump('Exception Message: ' . $message);

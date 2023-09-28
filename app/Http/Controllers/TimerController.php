@@ -42,12 +42,17 @@ class TimerController extends Controller
             $data->time_diff = $request->time_diff;
 
             //ScreenShot Captured Date
-            // $data->captured_at = Carbon::parse(Str::substr($request['captured_at'], 0, 33));
+             $data->captured_at = Carbon::parse(Str::substr($request['captured_at'], 0, 33));
             $data->captured_at = $request->captured_at;
 
             $data->save();
             //expected response
-            return response()->json([$data], 200);
+            $messege=trans('messege.store_timer');
+            return response()->json([
+                'Messege'=>$message,
+                'data'=>$data,
+                 'status'=>200,
+            ]);
         } catch (Exception $e) {
             //throw execption
             $message = $e->getMessage();
@@ -83,6 +88,7 @@ class TimerController extends Controller
             $month_time = (int)$monthly_time;
 
             //response 
+            $messege=trans('messge.get_timer');
             $response = [
                 'daily_time' => $day_time,
                 'weekly_time' => $week_time,
@@ -91,7 +97,10 @@ class TimerController extends Controller
 
 
 
-            return response()->json($response, 200);
+            return response()->json([
+                'Messege'=>$message,
+                'data'=>$response,
+                'status'=> 200,]);
         } catch (Exception $e) {
             //throw exeption
             $message = $e->getMessage();
@@ -154,7 +163,11 @@ class TimerController extends Controller
             try {
                 $data = Timer::where('user_id', $id)->whereDate('captured_at', $date)->select('screenshot', 'captured_at')->get();
                 //expected response
-                return response()->json($data, 200);
+                $message=('messege.get_user');
+                return response()->json([
+                    'Messege'=>$message,
+                    'data'=>$data, 
+                    'status'=>200,]);
             } catch (Exception $e) {
                 //throw exeption
                 $message = $e->getMessage();
