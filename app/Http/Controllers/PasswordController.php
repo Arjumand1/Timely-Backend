@@ -13,7 +13,7 @@ use Illuminate\Auth\Events\PasswordReset;
 class PasswordController extends Controller
 {
     //this method would send an email for resetting password
-    public function forgot(request $request)
+    public function forgot(Request $request)
     {
         //validate the request
         $request->validate(['email' => 'required|email']);

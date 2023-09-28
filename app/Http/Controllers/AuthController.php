@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Mail\WelcomeMail;
 use Illuminate\Http\Request;
+use App\Http\Requests\loginRequest;
+use App\Http\Requests\employeeRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -13,39 +15,18 @@ use Illuminate\Validation\Rules\Password;
 class AuthController extends Controller
 {
     //this method will register an admin
-    public function admincreate(Request $request)
+    public function admincreate(loginRequest $request)
     {
         try {
-            //validate the request
-            $request->validate([
-                'name' => 'required',
-                'email' => 'required',
-                'password' => ['required', Password::min(8)->letters()->mixedCase()->symbols()->numbers()->uncompromised()],
-                'company_name' => 'required',
-                'address' => 'required',
-                'country' => 'required'
-            ]);
-
-            //create employee
-            $data = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'company_name' => $request->company_name,
-                'company_img' => $request->company_img,
-                'address' => $request->address,
-                'country' => $request->country,
-                'role' => 0,   //admin
-            ]);
-
+            $user=User::create($request->validated());
+            return response()->json($user);
             //generate token
             $token = $data->createToken('my_Token')->plainTextToken;
-
+            
             $response = [
-                'data' => $data,
+                'data' => $user,
                 'token' => $token,
             ];
-
             //response expected
             return response()->json($response, 200);
         } catch (Exception $e) {
@@ -64,32 +45,12 @@ class AuthController extends Controller
     }
 
     //this method will register an employee
-    public function employeecreate(Request $request)
+    public function employeecreate(employeeRequest $request)
     {
         if (auth()->user()->role == 0) {
             try {
-                //validate the request
-                $request->validate(
-                    [
-                        'name' => 'required',
-                        'email' => 'required',
-                        'password' => ['required', Password::min(8)->letters()->mixedCase()->symbols()->numbers()->uncompromised()],
-                        'department' => 'required',
-                        'designation' => 'required'
-                    ],
-                );
-
-                //create employee
-                $employee = User::create([
-                    'name' => $request->name,
-                    'email' => $request->email,
-                    'password' => Hash::make($request->password),
-                    'department' => $request->department,
-                    'image' => $request->image,
-                    'designation' => $request->designation,
-                    'role' => 1, //employee
-                ]);
-
+                $employee=User::create($request->validated());
+        
                 Mail::to($employee)->send(new WelcomeMail($employee));
 
                 //expected response

@@ -14,14 +14,14 @@ use Ramsey\Uuid\Type\Integer;
 class TimerController extends Controller
 {
     //this method will store timer data with screenshot
-    public function store(Request $request, )
+    public function store(Request $request, $id)
     {
         try {
             //validate the request
             $request->validate([
                 'screenshot' => 'required',
                 'time_diff' => 'required',
-                'captured_at' => 'required',
+               'captured_at' => 'required',
                 'task_id'=>'required'
             ]);
 

@@ -8,10 +8,19 @@ use Exception;
 
 class TaskController extends Controller
 {
-    public function store(Request $request)
+    public function store(TaskRequest $request)
     {
         try {
-            $request->validate([
+            $task=Task::create($request->validated());
+            return response()->json($task, 200);
+            $token = $data->createToken('my_Token')->plainTextToken;
+            $response = [
+                'data' => $user,
+                'token' => $token,
+            ];
+            //response expected
+            return response()->json($response, 200);
+          /*  $request->validate([
                 'task_desc' => 'required',
                 'task_title' => 'required'
             ]);
@@ -22,7 +31,7 @@ class TaskController extends Controller
             $data->task_title = $request->task_title;
             $data->save();
 
-            return response()->json($data, 200);
+            return response()->json($data, 200);*/
         } catch (Exception $e) {
             $message = $e->getMessage();
             var_dump('Exception Message: ' . $message);
