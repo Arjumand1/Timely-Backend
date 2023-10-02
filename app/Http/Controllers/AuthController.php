@@ -19,19 +19,18 @@ class AuthController extends Controller
     {
         try {
             $user=User::create($request->validated());
-            return response()->json($user);
             //generate token
-            $token = $data->createToken('my_Token')->plainTextToken;
+            $token = $user->createToken('my_Token')->plainTextToken;
             
             $response = [
                 'user' => $user,
                 'token' => $token,
                 
             ];
-            $message=trans('messege.admin_create');
+           $message=trans('messeges.admin_create');
             //response expected
             return response()->json([
-                'Messege'=>$message,
+                //'Messege'=>$message,
                 'data'=>$response,
                 'status'=>200,
             ]);
@@ -60,7 +59,7 @@ class AuthController extends Controller
                 Mail::to($employee)->send(new WelcomeMail($employee));
 
                 //expected response
-                $message=trans('messege.employee_Create');
+                $message=trans('messeges.employee_Create');
                 return response()->json([
                     'Messege'=>$message,
                     'employee'=>$employee,
@@ -96,10 +95,11 @@ class AuthController extends Controller
 
             $user = User::where('email', $request->email)->first();
 
-            if (!$user || !Hash::check($request->password, $user->password)) {
+            if (!$user || $request->password !== $user->password) {
                 return response([
                     'message' => 'The provided credentials are incorrect.'
                 ], 403);
+            
             }
             //generate token
             $token = $user->createToken('mytoken')->plainTextToken;
@@ -108,7 +108,7 @@ class AuthController extends Controller
                 'user' => $user,
                 'token' => $token
             ];
-            $message=trans('messege.user_login');
+            $message=trans('messeges.user_login');
             //expected response
             return response()->json([
                 'Messege'=>$message,
