@@ -16,7 +16,6 @@ class TimerController extends Controller
     //this method will store timer data with screenshot
     public function store(Request $request, $id)
     {
-        try {
             //validate the request
             $request->validate([
                 'screenshot' => 'required',
@@ -47,32 +46,17 @@ class TimerController extends Controller
 
             $data->save();
             //expected response
-            $messege=trans('messege.store_timer');
+            $messege='stored_timer';
             return response()->json([
-                'Messege'=>$message,
+                'Messege'=>$messege,
                 'data'=>$data,
                  'status'=>200,
             ]);
-        } catch (Exception $e) {
-            //throw execption
-            $message = $e->getMessage();
-            var_dump('Exception Message: ' . $message);
-
-            $code = $e->getCode();
-            var_dump('Exception Code: ' . $code);
-
-            $string = $e->__toString();
-            var_dump('Exception String: ' . $string);
-
-            exit;
         }
-    }
-
     //get daily data of user
-    public function show()
+    public function show(Timerervice $service)
     {
-        try {
-            //daily time 
+            /*//daily time 
             $daily_time = Timer::where('user_id', auth()->user()->id)->whereDate('captured_at', Carbon::now()->toDateString())->sum('time_diff');
             //weekly time 
             $weekly_time = Timer::where('user_id', auth()->user()->id)
@@ -88,40 +72,27 @@ class TimerController extends Controller
             $month_time = (int)$monthly_time;
 
             //response 
-            $messege=trans('messge.get_timer');
+            $messege=trans('message.get_timer');
             $response = [
                 'daily_time' => $day_time,
                 'weekly_time' => $week_time,
                 'monthly_time' => $month_time
-            ];
-
-
+            ];*/
+            $messege='get_timer';
+          $response=$service->dailydataRecord();
 
             return response()->json([
-                'Messege'=>$message,
+                'Message'=>$messege,
                 'data'=>$response,
                 'status'=> 200,]);
-        } catch (Exception $e) {
-            //throw exeption
-            $message = $e->getMessage();
-            var_dump('Exception Message: ' . $message);
-
-            $code = $e->getCode();
-            var_dump('Exception Code: ' . $code);
-
-            $string = $e->__toString();
-            var_dump('Exception String: ' . $string);
-
-            exit;
-        }
-    }
+        } 
 
     //get all users
     public function alldata()
     {
-        if (auth()->user()->role == 0) {
-            try {
-                $data = User::select('id', 'name', 'email')
+       // if (auth()->user()->role == 0) 
+    {
+                /*$data = User::select('id', 'name', 'email')
                     //daily time 
                     ->withSum(['timers as daily_time' => function ($query) {
                         $query->whereDate('captured_at', Carbon::now()->toDateString());
@@ -134,54 +105,30 @@ class TimerController extends Controller
                     ->withSum(['timers as monthly_time' => function ($query) {
                         $query->whereBetween('captured_at', [Carbon::now()->startOfMonth()->subDay()->toDateString(), Carbon::today()->addDay()->toDateString()]);
                     }], 'time_diff')
-                    ->get();
-
+                    ->get();*/
+          $response=$service->getallUser();
                 //expected response
-                return response()->json($data, 200);
-            } catch (Exception $e) {
-                //throw exeption
-                $message = $e->getMessage();
-                var_dump('Exception Message: ' . $message);
-
-                $code = $e->getCode();
-                var_dump('Exception Code: ' . $code);
-
-                $string = $e->__toString();
-                var_dump('Exception String: ' . $string);
-
-                exit;
-            }
-        } else {
+                return response()->json([
+                    'data'=>$response,
+                    'status'=> 200]);
+        } /*else {
             return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        }*/
     }
 
     //get data of requested date,  screenshots and its captured date
     public function view($date, $id)
     {
         if (auth()->user()->role == 0) {
-            try {
                 $data = Timer::where('user_id', $id)->whereDate('captured_at', $date)->select('screenshot', 'captured_at')->get();
                 //expected response
-                $message=('messege.get_user');
+                $message='get_user';
                 return response()->json([
                     'Messege'=>$message,
                     'data'=>$data, 
                     'status'=>200,]);
-            } catch (Exception $e) {
-                //throw exeption
-                $message = $e->getMessage();
-                var_dump('Exception Message: ' . $message);
-
-                $code = $e->getCode();
-                var_dump('Exception Code: ' . $code);
-
-                $string = $e->__toString();
-                var_dump('Exception String: ' . $string);
-
-                exit;
-            }
-        } else {
+            } 
+         else {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
     }

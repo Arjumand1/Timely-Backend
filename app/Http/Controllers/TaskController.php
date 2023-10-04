@@ -10,7 +10,6 @@ class TaskController extends Controller
 {
     public function store(TaskRequest $request)
     {
-        try {
             $task=Task::create($request->validated());
             return response()->json($task, 200);
             $token = $data->createToken('my_Token')->plainTextToken;
@@ -18,50 +17,26 @@ class TaskController extends Controller
                 'user' => $user,
                 'token' => $token,
             ];
-            $message=trans('messege.store_task');
+            $message='stored_task';
             //response expected
             return response()->json([
                'Messege'=>$message,
                'data'=>$response,
                'status'=>200,
             ]);
-
-        } catch (Exception $e) {
-            $message = $e->getMessage();
-            var_dump('Exception Message: ' . $message);
-
-            $code = $e->getCode();
-            var_dump('Exception Code: ' . $code);
-
-            $string = $e->__toString();
-            var_dump('Exception String: ' . $string);
-
-            exit;
-        }
+       
     }
 
 
     public function show()
     {
-        try {
+
             $tasks = Task::where('user_id', auth()->user()->id)->get();
-            $message=trans('messege.get_tasks');
+            $message='get_tasks';
             return response()->json([
             'Messege'=>$message,
             'data'=>$task,
             'status'=>200,
             ]);
-        } catch (Exception $e) {
-            $message = $e->getMessage();
-            var_dump('Exception Message: ' . $message);
-
-            $code = $e->getCode();
-            var_dump('Exception Code: ' . $code);
-
-            $string = $e->__toString();
-            var_dump('Exception String: ' . $string);
-
-            exit;
-        }
     }
 }

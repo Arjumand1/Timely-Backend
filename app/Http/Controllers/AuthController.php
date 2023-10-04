@@ -17,7 +17,7 @@ class AuthController extends Controller
     //this method will register an admin
     public function adminCreate(LoginRequest $request)
     {
-        try {
+       
             $user=User::create($request->validated());
             //generate token
             $token = $user->createToken('my_Token')->plainTextToken;
@@ -27,57 +27,31 @@ class AuthController extends Controller
                 'token' => $token,
                 
             ];
-           $message=trans('messeges.admin_create');
+           $message='admin_created';
             //response expected
             return response()->json([
                 //'Messege'=>$message,
                 'data'=>$response,
                 'status'=>200,
             ]);
-        } catch (Exception $e) {
-            //thorw exception
-            $message = $e->getMessage();
-            var_dump('Exception Message: ' . $message);
-
-            $code = $e->getCode();
-            var_dump('Exception Code: ' . $code);
-
-            $string = $e->__toString();
-            var_dump('Exception String: ' . $string);
-
-            exit;
         }
-    }
 
     //this method will register an employee
     public function employeeCreate(EmployeeRequest $request)
     {
         if (auth()->user()->role == 0) {
-            try {
+        
                 $employee=User::create($request->validated());
         
                 Mail::to($employee)->send(new WelcomeMail($employee));
 
                 //expected response
-                $message=trans('messeges.employee_Create');
+                $message='employee_Created';
                 return response()->json([
                     'Messege'=>$message,
                     'employee'=>$employee,
                     'status'=>200,
                 ]);
-            } catch (Exception $e) {
-                //throw exception
-                $message = $e->getMessage();
-                var_dump('Exception Message: ' . $message);
-
-                $code = $e->getCode();
-                var_dump('Exception Code: ' . $code);
-
-                $string = $e->__toString();
-                var_dump('Exception String: ' . $string);
-
-                exit;
-            }
         } else {
             return response()->json(['message' => 'Unauthorized.'], 403);
         }
@@ -86,7 +60,7 @@ class AuthController extends Controller
     //login
     public function login(Request $request)
     {
-        try {
+        
             //validate request
             $request->validate([
                 'email' => 'required|email',
@@ -108,32 +82,18 @@ class AuthController extends Controller
                 'user' => $user,
                 'token' => $token
             ];
-            $message=trans('messeges.user_login');
+            $message='user_login successfully' ;
             //expected response
             return response()->json([
                 'Messege'=>$message,
                 'data'=>$response,
                 'status'=>200,
             ]);
-        } catch (Exception $e) {
-            //throw execption
-            $message = $e->getMessage();
-            var_dump('Exception Message: ' . $message);
-
-            $code = $e->getCode();
-            var_dump('Exception Code: ' . $code);
-
-            $string = $e->__toString();
-            var_dump('Exception String: ' . $string);
-
-            exit;
-        }
     }
 
     //user can logout through this method
     public function logout(Request $request)
     {
-        try {
             $token = request()->user()->currentAccessToken()->token;
             $request->user()->tokens()->where('token', $token)->delete();
             // expected response
@@ -142,18 +102,6 @@ class AuthController extends Controller
                 'message' =>$message,
                 'status'=>200,
             ], 200);
-        } catch (Exception $e) {
-            //throw execption
-            $message = $e->getMessage();
-            var_dump('Exception Message: ' . $message);
-
-            $code = $e->getCode();
-            var_dump('Exception Code: ' . $code);
-
-            $string = $e->__toString();
-            var_dump('Exception String: ' . $string);
-
-            exit;
-        }
+        
     }
 }
