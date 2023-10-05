@@ -7,15 +7,7 @@ use App\Models\{Timer,User};
 
 class TimerService extends ServiceProvider
 {
-    /**
-     * Register services.
-     *
-     * @return void
-     */
-    public function register()
-    {
-        //
-    }
+
     public function dailydataRecord()
     {
          //daily time 
@@ -34,7 +26,7 @@ class TimerService extends ServiceProvider
          $month_time = (int)$monthly_time;
 
          //response 
-         $messege=trans('message.get_timer');
+         $messege='get_timer';
          $response = [
              'daily_time' => $day_time,
              'weekly_time' => $week_time,
@@ -43,23 +35,23 @@ class TimerService extends ServiceProvider
 
     }
     public function getallUser(){
-        if (auth()->user()->role == 0) {
-                $data = User::select('id', 'name', 'email')
-                    //daily time 
-                    ->withSum(['timers as daily_time' => function ($query) {
-                        $query->whereDate('captured_at', Carbon::now()->toDateString());
-                    }], 'time_diff')
-                    //weekly time
-                    ->withSum(['timers as weekly_time' => function ($query) {
-                        $query->whereBetween('captured_at', [Carbon::now()->startOfWeek()->subDay()->toDateString(), Carbon::today()->addDay()->toDateString()]);
-                    }], 'time_diff')
-                    //monthly time
-                    ->withSum(['timers as monthly_time' => function ($query) {
-                        $query->whereBetween('captured_at', [Carbon::now()->startOfMonth()->subDay()->toDateString(), Carbon::today()->addDay()->toDateString()]);
-                    }], 'time_diff')
-                    ->get();
+    if (auth()->user()->role == 0) {
+     $data = User::select('id', 'name', 'email')
+     //daily time 
+     ->withSum(['timers as daily_time' => function ($query) {
+     $query->whereDate('captured_at', Carbon::now()->toDateString());
+    }], 'time_diff')
+    //weekly time
+   ->withSum(['timers as weekly_time' => function ($query) {
+    $query->whereBetween('captured_at', [Carbon::now()->startOfWeek()->subDay()->toDateString(), Carbon::today()->addDay()->toDateString()]);
+     }], 'time_diff')
+    //monthly time
+    ->withSum(['timers as monthly_time' => function ($query) {
+    $query->whereBetween('captured_at', [Carbon::now()->startOfMonth()->subDay()->toDateString(), Carbon::today()->addDay()->toDateString()]);
+     }], 'time_diff')
+    ->get();
     }else {
-        ['response' => 'Unauthorized'];
+        [' Unauthorized'];
     }
 }
     
