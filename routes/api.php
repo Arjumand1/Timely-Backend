@@ -19,7 +19,7 @@ use App\Http\Controllers\TimerController;
 
 Route::controller(AuthController::class)->group(function () {
     //admin signup route
-    Route::post('signup', 'admincreate');
+    Route::post('signup', 'adminCreate');
     //login
     Route::post('login', 'login');
 });
@@ -31,7 +31,7 @@ Route::middleware('auth:sanctum')->group(function () {
         //logout
         Route::post('logout', 'logout');
         //employee signup form
-        Route::post('employee-signup', 'employeecreate');
+        Route::post('employee-signup', 'employeeCreate');
     });
 
     //task controller
